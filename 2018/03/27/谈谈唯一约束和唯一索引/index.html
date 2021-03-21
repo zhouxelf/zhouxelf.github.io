@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>谈谈唯一约束和唯一索引 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MySQL,索引," />
+  
+
+  <meta name="description" content="最近在看数据库相关知识，感觉唯一约束和唯一索引好像有点类似，于是研究了一番，于是就有了这篇文章。 概念开始之前，先解释一下约束和索引。 约束 全称完整性约束，它是关系数据库中的对象，用来存放插入到一个表中一列数据的规则，用来确保数据的准确性和一致性。 索引 数据库中用的最频繁的操作是数据查询，索引就是为了加速表中数据行的检索而创建的一种分散的数据结构。可以把索引类比成书的目录，有目录的肯定比没有目">
+<meta property="og:type" content="article">
+<meta property="og:title" content="谈谈唯一约束和唯一索引">
+<meta property="og:url" content="https://zhouxelf.com/2018/03/27/%E8%B0%88%E8%B0%88%E5%94%AF%E4%B8%80%E7%BA%A6%E6%9D%9F%E5%92%8C%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="最近在看数据库相关知识，感觉唯一约束和唯一索引好像有点类似，于是研究了一番，于是就有了这篇文章。 概念开始之前，先解释一下约束和索引。 约束 全称完整性约束，它是关系数据库中的对象，用来存放插入到一个表中一列数据的规则，用来确保数据的准确性和一致性。 索引 数据库中用的最频繁的操作是数据查询，索引就是为了加速表中数据行的检索而创建的一种分散的数据结构。可以把索引类比成书的目录，有目录的肯定比没有目">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_1.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_2.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_3.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_4.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_5.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_6.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_7.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_8.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_9.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_10.jpg">
+<meta property="article:published_time" content="2018-03-27T12:56:49.000Z">
+<meta property="article:modified_time" content="2021-03-21T08:57:44.104Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_1.jpg">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5"><span class="toc-text">概念</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8E%A2%E7%A9%B6"><span class="toc-text">探究</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%8D%E6%8E%A2%E6%B1%82"><span class="toc-text">再探求</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-谈谈唯一约束和唯一索引" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">谈谈唯一约束和唯一索引</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2018.03.27</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>最近在看数据库相关知识，感觉唯一约束和唯一索引好像有点类似，于是研究了一番，于是就有了这篇文章。</p>
+<h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>开始之前，先解释一下约束和索引。</p>
+<p><strong>约束</strong> 全称完整性约束，它是关系数据库中的对象，用来存放插入到一个表中一列数据的规则，用来确保数据的准确性和一致性。</p>
+<p><strong>索引</strong> 数据库中用的最频繁的操作是数据查询，索引就是为了加速表中数据行的检索而创建的一种分散的数据结构。可以把索引类比成书的目录，有目录的肯定比没有目录的书，更方便查找。</p>
+<p><strong>唯一约束</strong> 保证在一个字段或者一组字段里的数据都与表中其它行的对应数据不同。和主键约束不同，唯一约束允许为 NULL，只是只能有一行。</p>
+<p><strong>唯一索引</strong> 不允许具有索引值相同的行，从而禁止重复的索引或键值。</p>
+<p>唯一约束和唯一索引都是为了保证表中被限制的字段不允许有重复的值，看起来功能是一样的，那为什么要设计这样两种一样的功能呢？</p>
+<h1 id="探究"><a href="#探究" class="headerlink" title="探究"></a>探究</h1><p>带着这个问题，我在网上搜索了一番。</p>
+<p>最开始，在 Oracle 的社区里看到了下面这个对话，原问题链接：<a target="_blank" rel="noopener" href="https://community.oracle.com/message/4110430">https://community.oracle.com/message/4110430</a></p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_1.jpg"></p>
+<p>大概意思是说，他看了一本关于 Oracle 的书，书中说，唯一约束和唯一索引是不同的，但是书中没解释这两个有什么不同。</p>
+<p>然后下面跟了一个答案如下</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_2.jpg"></p>
+<p>大意是说，约束和索引是不同的，约束为优化提供了更多信息，并且允许在唯一约束上建立外键，而唯一索引是不行的，然后还提供了一个小例子。</p>
+<p>不能听他说两句就相信了，本着实践出真理的原则，我做了下面的求证。尽管文章中提到的是 Oracle 数据库，而我本地的是 MySQL，不过还是决定试一遍，按照他给出的例子，在本地做了如下测试。</p>
+<p>首先创建两个字段值一样的表 t1，t2，并为 t1 表中的 col1 列设置唯一约束。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t1 (</span><br><span class="line">    col1 <span class="type">INT</span>(<span class="number">11</span>), </span><br><span class="line">    col2 <span class="type">VARCHAR</span>(<span class="number">20</span>), </span><br><span class="line">    <span class="keyword">CONSTRAINT</span> t1_uq <span class="keyword">UNIQUE</span> (col1)</span><br><span class="line">);</span><br><span class="line">         </span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t2 (</span><br><span class="line">    col1 <span class="type">INT</span>(<span class="number">11</span>), </span><br><span class="line">    col2 <span class="type">VARCHAR</span>(<span class="number">20</span>)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_3.jpg"></p>
+<p>然后为表 t2 表中的 col1 列设置唯一索引</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">UNIQUE</span> INDEX </span><br><span class="line">    t2_idx <span class="keyword">ON</span> t2 (col1);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_4.jpg"></p>
+<p>创建表 t3，并将 t1 表中的 col1 列设置为 t3 表中 col2 列的外键</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t3 (</span><br><span class="line">    col1 <span class="type">INT</span>(<span class="number">11</span>), </span><br><span class="line">    col2 <span class="type">INT</span>(<span class="number">11</span>), </span><br><span class="line">    col3 <span class="type">VARCHAR</span>(<span class="number">20</span>), </span><br><span class="line">    <span class="keyword">CONSTRAINT</span> t3_fk <span class="keyword">FOREIGN</span> KEY (col2) <span class="keyword">REFERENCES</span> t1 (col1)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>运行结果</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_5.jpg"></p>
+<p>创建表 t4，并将 t2 表中的 col1 列设置为 t4 表中 col2 列的外键</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t4 (</span><br><span class="line">    col1 <span class="type">INT</span>(<span class="number">11</span>), </span><br><span class="line">    col2 <span class="type">INT</span>(<span class="number">11</span>), </span><br><span class="line">    col3 <span class="type">VARCHAR</span>(<span class="number">20</span>), </span><br><span class="line">    <span class="keyword">CONSTRAINT</span> t4_fk <span class="keyword">FOREIGN</span> KEY (col2) <span class="keyword">REFERENCES</span> t2 (col1)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>重点来了，根据上面回答唯一约束和唯一索引的区别，t4 表应该是建不成功的，因为 t4 表中 col2 列依赖于 t2 表中 col1 列，而 t2 表中的 col1 列建立了唯一索引，并没有建立唯一约束，因此 t4 表应该建立失败。</p>
+<p>然而，运行结果如下</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_6.jpg"></p>
+<p>是的，没有看错，表 t4 建立成功了，并没有报错，也没有出现上面回答中提到的结果。</p>
+<p>为什么会这样呢，首先想到的就是不同的数据库对这一点的实现方式不同，Oracle 数据库下会是这样的区别，其它数据库就不一定了。</p>
+<p>正好，电脑上装的有 SQL Server 2008，在 SQL Server 依次执行了一遍，也都成功了，没出现上面提到的问题。</p>
+<p>难道只有 Oracle 数据库里才有那样的区别，如果你电脑上刚好有 Oracle，可以帮我试一下。</p>
+<h1 id="再探求"><a href="#再探求" class="headerlink" title="再探求"></a>再探求</h1><p>难道唯一约束和唯一索引，在 MySQL 和 SQL Server 里真的一点区别都没有吗？</p>
+<p>用 Navicat 打开刚刚在 MySQL 数据库里建好的表，看下表定义</p>
+<p>表 t1 DDL</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_7.jpg"></p>
+<p>表 t2 DDL</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_8.jpg"></p>
+<p>表 t1 是直接在建表时对 col1 列定义唯一约束的，而表 t2 是建立完成后，通过修改表才对 col1 列建立唯一索引的。但是最终两个表的 DDL 完全一样，说明在 MySQL 数据库里唯一约束和唯一索引只是概念不同，在不同的功能中叫法不同罢了，其实现方式是完全一样的。</p>
+<p>再次用 Navicat 打开刚刚在 SQL Server 数据库里建好的表，看下表定义</p>
+<p>表 t1 DDL</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_9.jpg"></p>
+<p>表 t2 DDL</p>
+<p><img src="/images/%E7%BA%A6%E6%9D%9F%E7%B4%A2%E5%BC%95_10.jpg"></p>
+<p>可以看出，和 MySQL 数据库不同，SQL Server 数据库下，表 t1 为 col1 列建立了唯一约束，表 t2 为 col1 列建立了唯一索引，但是表 t3 和 t4 也被成功建立了，可见最终的结果还是一样，也即没有证明上面那个回答。至于 SQL Server 下除此之外，还有没有其它的区别，在我搜索的答案中暂时还没发现，如果你发现了，欢迎回复交流。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>到此为止，基本上就能得出，唯一约束和唯一索引在 MySQL 数据库里区别了</p>
+<ol>
+<li>概念上不同，约束是为了保证数据的完整性，索引是为了辅助查询；</li>
+<li>创建唯一约束时，会自动的创建唯一索引；</li>
+<li>在理论上，不一样，在实际使用时，基本没有区别。</li>
+</ol>
+<p>关于第二条，MySQL 中唯一约束是通过唯一索引实现的，为了保证没有重复值，在插入新记录时会再检索一遍，怎样检索快，当然是建索引了，所以，在创建唯一约束的时候就创建了唯一索引。<br><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2018/03/26/MySQL%20%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%87%A0%E4%B8%AA%E9%97%AE%E9%A2%98/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2018/04/06/MySQL%20Explain%20%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="谈谈唯一约束和唯一索引"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

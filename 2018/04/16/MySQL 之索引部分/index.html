@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>MySQL 之索引部分 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MySQL,索引," />
+  
+
+  <meta name="description" content="索引概述索引的本质及作用索引（也称「键」）是为了加速表中数据行的检索而创建的一种分散的数据结构。 数据库查询是数据库的最主要功能之一。我们都希望查询数据的速度能尽可能的快，因此数据库系统的设计者会从查询算法的角度进行优化。最基本的查询算法当然是顺序查找（linear search），这种复杂度为 O(n) 的算法在数据量很大时显然是糟糕的，好在计算机科学的发展提供了很多更优秀的查找算法，例如二分查">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL 之索引部分">
+<meta property="og:url" content="https://zhouxelf.com/2018/04/16/MySQL%20%E4%B9%8B%E7%B4%A2%E5%BC%95%E9%83%A8%E5%88%86/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="索引概述索引的本质及作用索引（也称「键」）是为了加速表中数据行的检索而创建的一种分散的数据结构。 数据库查询是数据库的最主要功能之一。我们都希望查询数据的速度能尽可能的快，因此数据库系统的设计者会从查询算法的角度进行优化。最基本的查询算法当然是顺序查找（linear search），这种复杂度为 O(n) 的算法在数据量很大时显然是糟糕的，好在计算机科学的发展提供了很多更优秀的查找算法，例如二分查">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-04-16T08:07:23.000Z">
+<meta property="article:modified_time" content="2021-03-21T08:57:44.104Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E6%A6%82%E8%BF%B0"><span class="toc-text">索引概述</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E6%9C%AC%E8%B4%A8%E5%8F%8A%E4%BD%9C%E7%94%A8"><span class="toc-text">索引的本质及作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-text">索引的优缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-text">索引的类型</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E7%A7%8D%E5%B8%B8%E7%94%A8%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E7%B4%A2%E5%BC%95%E6%94%AF%E6%8C%81%E6%83%85%E5%86%B5"><span class="toc-text">三种常用存储引擎索引支持情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#B-Tree-%E7%B4%A2%E5%BC%95"><span class="toc-text">B-Tree 索引</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-text">索引的操作</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA"><span class="toc-text">创建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9"><span class="toc-text">修改</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A0%E9%99%A4"><span class="toc-text">删除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B"><span class="toc-text">查看</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84%E9%80%89%E6%8B%A9"><span class="toc-text">索引的选择</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9%E5%8E%9F%E5%88%99"><span class="toc-text">索引选择原则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9%E5%8E%9F%E5%88%99%E7%BB%86%E8%BF%B0"><span class="toc-text">索引选择原则细述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E9%80%89%E6%8B%A9%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">索引选择注意事项</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%B4%A2%E5%BC%95%E6%98%AF%E6%9C%80%E5%A5%BD%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88%EF%BC%9F"><span class="toc-text">索引是最好的解决方案？</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-MySQL 之索引部分" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">MySQL 之索引部分</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2018.04.16</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="索引概述"><a href="#索引概述" class="headerlink" title="索引概述"></a>索引概述</h1><h2 id="索引的本质及作用"><a href="#索引的本质及作用" class="headerlink" title="索引的本质及作用"></a>索引的本质及作用</h2><p>索引（也称「键」）是为了加速表中数据行的检索而创建的一种分散的数据结构。</p>
+<p>数据库查询是数据库的最主要功能之一。我们都希望查询数据的速度能尽可能的快，因此数据库系统的设计者会从查询算法的角度进行优化。最基本的查询算法当然是顺序查找（linear search），这种复杂度为 O(n) 的算法在数据量很大时显然是糟糕的，好在计算机科学的发展提供了很多更优秀的查找算法，例如二分查找（binary search）、二叉树查找（binary tree search）等。如果稍微分析一下会发现，每种查找算法都只能应用于特定的数据结构之上，例如二分查找要求被检索数据有序，而二叉树查找只能应用于二叉查找树上，但是数据本身的组织结构不可能完全满足各种数据结构（例如，理论上不可能同时将两列都按顺序进行组织），所以，在数据之外，数据库系统还维护着满足特定查找算法的数据结构，这些数据结构以某种方式引用（指向）数据，这样就可以在这些数据结构上实现高级查找算法。这种数据结构，就是索引。</p>
+<h2 id="索引的优缺点"><a href="#索引的优缺点" class="headerlink" title="索引的优缺点"></a>索引的优缺点</h2><p><strong>优点</strong></p>
+<ol>
+<li>大大加快数据的检索速度；</li>
+<li>创建唯一性索引，能保证数据库表中每一行数据的唯一性；</li>
+<li>加速表与表之间的连接；</li>
+<li>在使用分组和排序子句进行数据检索时，可以显著减少查询中分组和排序的时间。</li>
+</ol>
+<p><strong>缺点</strong></p>
+<ol>
+<li>索引需要占用额外的物理空间；</li>
+<li>当对表中的数据进行增加、删除和修改时，索引也需要动态的维护，降低了数据的维护速度。</li>
+</ol>
+<h1 id="索引的类型"><a href="#索引的类型" class="headerlink" title="索引的类型"></a>索引的类型</h1><p>在 MySQL 中，索引是在存储引擎层而不是服务器层实现的，所以，并没有统一的索引标准。不同存储引擎的索引的工作方式并不一样，也不是所有的存储引擎都支持所有类型的索引。即使多个存储引擎支持同一种类型的索引，其底层的实现方式也可能不同。</p>
+<p>目前 MySQL 提供了常用的四种索引：</p>
+<ul>
+<li>B-Tree 索引：最常见的索引类型，大部分引擎都支持 B-Tree 索引；</li>
+<li>Hash 索引：只有 Memory 引擎支持 Hash 索引，基于 Hash 表实现，使用场景简单；</li>
+<li>R-Tree：空间数据索引，MyISAM 引擎支持，主要用于地理数据存储；</li>
+<li>全文索引：一种特殊类型的索引，类似于搜索引擎的功能。</li>
+</ul>
+<p><strong>说明：</strong> 平时讨论的索引，如果没有特别指明，一般都是指 B-Tree 索引，而且从技术上说，底层实现方式其实是 B+Tree。 B-Tree 索引又分为几种，比如普通索引、唯一索引、主键索引等等。关于全文索引，详见 <a target="_blank" rel="noopener" href="http://mrzhouxiaofei.com/2018/04/14/MySQL%20%E4%B9%8B%E5%85%A8%E6%96%87%E7%B4%A2%E5%BC%95/">MySQL 之全文索引</a></p>
+<h2 id="三种常用存储引擎索引支持情况"><a href="#三种常用存储引擎索引支持情况" class="headerlink" title="三种常用存储引擎索引支持情况"></a>三种常用存储引擎索引支持情况</h2><table>
+<thead>
+<tr>
+<th>索引</th>
+<th>MyISAM</th>
+<th>InnoDB</th>
+<th>Memory</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B-Tree</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Hash 索引</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>R-Tree 索引</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>全文索引</td>
+<td>Yes</td>
+<td>5.6 之后</td>
+<td>No</td>
+</tr>
+</tbody></table>
+<h2 id="B-Tree-索引"><a href="#B-Tree-索引" class="headerlink" title="B-Tree 索引"></a>B-Tree 索引</h2><ul>
+<li>普通索引：创建普通索引时，不限制任何条件（唯一、非空等限制），该类型的索引可以创建在任何数据类型上。</li>
+<li>唯一索引：UNIQUE，唯一索引，就是限制被索引的值必须是唯一的。当为表中某个字段设置主键或唯一性约束时，系统会自动创建关联该字段的唯一索引。</li>
+<li>主键索引：PRIMARY，主键索引，一种特殊的唯一索引，不允许有空值。</li>
+</ul>
+<p><strong>说明：</strong> 关于唯一索引和唯一约束的探讨，详见 <a target="_blank" rel="noopener" href="http://mrzhouxiaofei.com/2018/03/27/%E8%B0%88%E8%B0%88%E5%94%AF%E4%B8%80%E7%BA%A6%E6%9D%9F%E5%92%8C%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95/">谈谈唯一约束和唯一索引</a></p>
+<h1 id="索引的操作"><a href="#索引的操作" class="headerlink" title="索引的操作"></a>索引的操作</h1><h2 id="创建"><a href="#创建" class="headerlink" title="创建"></a>创建</h2><p>三种创建方式</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span> <span class="number">1.</span> 建表时创建</span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> 表名 (</span><br><span class="line">    id <span class="type">int</span>(<span class="number">11</span>),</span><br><span class="line">    xxx xxx,</span><br><span class="line">    [索引类型] index<span class="operator">|</span>key [索引名] (属性名<span class="number">1</span> [(长度)] [<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>]) </span><br><span class="line">);</span><br><span class="line">      </span><br><span class="line"><span class="operator">/</span><span class="operator">/</span> <span class="number">2.</span> 直接创建</span><br><span class="line"><span class="keyword">create</span> index 索引名</span><br><span class="line">    <span class="keyword">on</span> 表名 (属性名 [(长度)] [<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>]);</span><br><span class="line">           </span><br><span class="line"><span class="operator">/</span><span class="operator">/</span> <span class="number">3.</span> 修改表创建</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 表名</span><br><span class="line">    <span class="keyword">add</span> [索引类型] index<span class="operator">|</span>key [索引名] (属性名<span class="number">1</span> [(长度)] [<span class="keyword">ASC</span><span class="operator">|</span><span class="keyword">DESC</span>]);</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong> 不能使用第二种方式创建主键索引</p>
+<h2 id="修改"><a href="#修改" class="headerlink" title="修改"></a>修改</h2><p>没必要修改，直接删除重建即可。</p>
+<h2 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h2><p>两种删除方式</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">/</span><span class="operator">/</span> <span class="number">1.</span> 直接删除</span><br><span class="line"><span class="keyword">drop</span> index 索引名</span><br><span class="line">    <span class="keyword">on</span> 表名;</span><br><span class="line">          </span><br><span class="line"><span class="operator">/</span><span class="operator">/</span> <span class="number">2.</span> 修改表删除</span><br><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 表名</span><br><span class="line">    <span class="keyword">drop</span> index 索引名;</span><br></pre></td></tr></table></figure>
+
+<h2 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">show</span> index<span class="operator">|</span>keys <span class="keyword">from</span> 表名 </span><br></pre></td></tr></table></figure>
+
+<p>列的意义：</p>
+<ul>
+<li>Table：表名</li>
+<li>Non_unique：如果索引值唯一，则为 0，否则为 1</li>
+<li>Key_name：索引名</li>
+<li>Seq_in_index：索引中列的序列号，从 1 开始</li>
+<li>Column_name：列名</li>
+<li>Collation：列在索引中的存储形式，在 MySQL 中，值「A」（升序）或 NULL（无分类）</li>
+<li>Cardinality：索引中唯一值数目的估计值</li>
+<li>Sub_part：如果列只是被部分地编入索引，则为被编入索引的字符的数目，如果整列被编入索引，则为 NULL</li>
+<li>Packed：说明关键字如何被压缩，如果没有被压缩，则为 NULL</li>
+<li>Null：如果列含有 NULL，则值为 YES，如果没有，则该列为 NO</li>
+<li>Index_type：索引类型（BTREE，FULLTEXT，HASH，RTREE）</li>
+<li>Comment：更多评论</li>
+</ul>
+<h1 id="索引的选择"><a href="#索引的选择" class="headerlink" title="索引的选择"></a>索引的选择</h1><h2 id="索引选择原则"><a href="#索引选择原则" class="headerlink" title="索引选择原则"></a>索引选择原则</h2><ol>
+<li>较频繁的作为查询条件的字段应该创建索引；</li>
+<li>唯一性太差的字段（比如性别）不适合单独创建索引，即使频繁作为查询条件；</li>
+<li>更新非常频繁的字段不适合创建索引；</li>
+<li>不会出现在 Where 子句中的字段不该创建索引。</li>
+</ol>
+<h2 id="索引选择原则细述"><a href="#索引选择原则细述" class="headerlink" title="索引选择原则细述"></a>索引选择原则细述</h2><ul>
+<li>性能优化过程中，选择在哪个列上创建索引是最非常重要的。可以考虑使用索引的主要有两种类型的列：<strong>在 where 子句中出现的列，在 join 子句中出现的列，</strong> 而不是在 select 关键字后选择列表的列。</li>
+<li>索引列的基数越大，索引的效果越好。例如，存放出生日期的列具有不同的值，很容易区分行，而用来记录性别的列，只有「男」和「女」，对此进行索引没有多大用处，因为不管搜索哪个值，都会得出大约一半的行。</li>
+<li>使用短索引，如果对字符串列进行索引，应该指定一个前缀长度，可节省大量索引空间，提升查询速度。</li>
+<li>利用最左前缀原则。</li>
+</ul>
+<h2 id="索引选择注意事项"><a href="#索引选择注意事项" class="headerlink" title="索引选择注意事项"></a>索引选择注意事项</h2><p>既然索引可以加快查询速度，那么是不是只要查询语句需要，就创建索引？答案是否定的。因为索引虽然加快了查询速度，但索引也是有代价的：索引文件本身要消耗存储空间，同时索引会加重插入、删除和修改记录时的负担，另外，MySQL 在运行时也要消耗资源维护索引，因此索引并不是越多越好。</p>
+<p><strong>一般下面两种情况不建议建索引：</strong></p>
+<ol>
+<li>表记录比较少，例如一两千条甚至只有几百条记录的表，没必要建索引，让查询做全表扫描就好了；</li>
+<li>索引的选择性较低，所谓索引的选择性（Selectivity），是指不重复的索引值（也叫基数，Cardinality）与表记录数（#T）的比值：<strong>Index Selectivity = Cardinality / #T</strong> 显然选择性的取值范围为 (0, 1]，选择性越高的索引价值越大，这是由 B+Tree 的性质决定的。</li>
+</ol>
+<p>除此之外，还有两个点需要注意：</p>
+<ol>
+<li>MySQL 只对以下操作符才使用索引：&lt;、&lt;=、=、&gt;、&gt;=、between、in，以及某些时候的 like（不以通配符 % 或 _ 开头)；</li>
+<li>不要过度索引，只保持需要的索引。每个额外的索引都要占用额外的磁盘空间，并降低写操作的性能。在修改表的内容时，索引必须进行更新，有时可能需要重构，因此，索引越多，所花的时间越长。</li>
+</ol>
+<h1 id="索引是最好的解决方案？"><a href="#索引是最好的解决方案？" class="headerlink" title="索引是最好的解决方案？"></a>索引是最好的解决方案？</h1><p>索引并不总是最好的解决方案。总的来说，只有当索引帮助存储引擎快速查找到记录带来的好处大于其带来的额外工作时，索引才是有效的。对于非常小的表，大部分情况下简单的全表扫描更高效。对于中到大型的表，索引就非常有效。但对于特大型的表，建立和使用索引的代价将随之增长。这种情况下，则需要一种技术可以直接区分出查询需要的一组数据，而不是一条记录一条记录地匹配。这是就要使用分表、分库等分区技术了。</p>
+<p><strong>参考文章</strong></p>
+<p><a target="_blank" rel="noopener" href="http://blog.codinglabs.org/articles/theory-of-mysql-index.html">MySQL索引背后的数据结构及算法原理</a><br><a target="_blank" rel="noopener" href="http://book.51cto.com/art/200906/132452.htm">索引的利弊与如何判定，是否需要索引</a><br>高性能 MySQL（第三版）<br><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2018/04/14/MySQL%20%E4%B9%8B%E5%85%A8%E6%96%87%E7%B4%A2%E5%BC%95/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2018/04/26/%E8%BF%9C%E8%A1%8C/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="MySQL 之索引部分"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
