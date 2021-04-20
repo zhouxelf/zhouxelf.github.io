@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java NIO 原理 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Java,NIO," />
+  
+
+  <meta name="description" content="Java IO 读写原理无论是 Socket 的读写还是文件的读写，在 Java 层面的应用开发或者 Linux 系统底层的开发，都属于输入(Input)和输出(Output)的处理，简称为 IO 读写。 用户程序进行 IO 读写，基本都会用到 Read&#x2F;Write 两大系统调用。 一个基础知识：Read 系统调用，并不是把数据直接从物理设备读到内存，Write 系统调用也不是直接把数据写入到物理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java NIO 原理">
+<meta property="og:url" content="https://zhouxelf.com/2020/01/10/Java%20NIO%20%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="Java IO 读写原理无论是 Socket 的读写还是文件的读写，在 Java 层面的应用开发或者 Linux 系统底层的开发，都属于输入(Input)和输出(Output)的处理，简称为 IO 读写。 用户程序进行 IO 读写，基本都会用到 Read&#x2F;Write 两大系统调用。 一个基础知识：Read 系统调用，并不是把数据直接从物理设备读到内存，Write 系统调用也不是直接把数据写入到物理">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%A9%BA%E9%97%B4.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9EIO.jpeg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9EIO.jpeg">
+<meta property="og:image" content="https://zhouxelf.com/images/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.jpeg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%BC%82%E6%AD%A5IO.jpeg">
+<meta property="article:published_time" content="2020-01-10T13:34:03.000Z">
+<meta property="article:modified_time" content="2021-04-20T09:43:59.443Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="NIO">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%A9%BA%E9%97%B4.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Java-IO-%E8%AF%BB%E5%86%99%E5%8E%9F%E7%90%86"><span class="toc-text">Java IO 读写原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E6%A0%B8%E7%BC%93%E5%86%B2%E5%8C%BA%E5%92%8C%E8%BF%9B%E7%A8%8B%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="toc-text">内核缓冲区和进程缓冲区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Java-IO-%E8%AF%BB%E5%86%99%E7%9A%84%E5%BA%95%E5%B1%82%E6%B5%81%E7%A8%8B"><span class="toc-text">Java IO 读写的底层流程</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9B%9B%E7%A7%8D%E4%B8%BB%E8%A6%81%E7%9A%84-IO-%E6%A8%A1%E5%9E%8B"><span class="toc-text">四种主要的 IO 模型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E-IO-Blocking-IO"><span class="toc-text">同步阻塞 IO (Blocking IO)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9E-IO-None-Blocking-IO"><span class="toc-text">同步非阻塞 IO (None Blocking IO)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IO-%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8-IO-Multiplexing"><span class="toc-text">IO 多路复用 (IO Multiplexing)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5-IO-Asynchronous-IO"><span class="toc-text">异步 IO (Asynchronous IO)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Java NIO 原理" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Java NIO 原理</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.01.10</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="Java-IO-读写原理"><a href="#Java-IO-读写原理" class="headerlink" title="Java IO 读写原理"></a>Java IO 读写原理</h1><p><strong>无论是 Socket 的读写还是文件的读写，在 Java 层面的应用开发或者 Linux 系统底层的开发，都属于输入(Input)和输出(Output)的处理，简称为 IO 读写。</strong></p>
+<p>用户程序进行 IO 读写，基本都会用到 Read/Write 两大系统调用。</p>
+<p>一个基础知识：Read 系统调用，并不是把数据直接从物理设备读到内存，Write 系统调用也不是直接把数据写入到物理设备。</p>
+<ul>
+<li>Read 系统调用，是把数据从内核缓冲区复制到进程缓冲区；</li>
+<li>Write 系统调用，是把数据从进程缓冲区复制到内核缓冲区。</li>
+</ul>
+<p>这两个系统调用，都不负责数据在内核缓冲区和磁盘之前的交换，底层的读写交换，是由操作系统 Kernel 内核实现的。</p>
+<h3 id="内核缓冲区和进程缓冲区"><a href="#内核缓冲区和进程缓冲区" class="headerlink" title="内核缓冲区和进程缓冲区"></a>内核缓冲区和进程缓冲区</h3><p>系统调用前需要先保存之前的进程数据和状态等信息，结束调用后还需要恢复之前的数据，为了减少这种损耗时间、损耗性能的系统调用，于是出现的缓冲区。</p>
+<p><strong>在 Linux 系统中，系统内核有个内核缓冲区；每个进程有自己的进程缓冲区。</strong></p>
+<p>有了缓冲区，操作系统使用 Read 函数把数据从内核缓冲区复制到进程缓冲区，Write 函数把数据从进程缓冲区复制到内核缓冲区中。数据不是实时进行 IO，而是暂存在缓冲区，等缓冲区数据达到一定量的时候，再进行 IO 调用，提升性能。</p>
+<h3 id="Java-IO-读写的底层流程"><a href="#Java-IO-读写的底层流程" class="headerlink" title="Java IO 读写的底层流程"></a>Java IO 读写的底层流程</h3><p>用户程序进行 IO 的读写，基本上会用到系统调用 Read、Write，系统调用的时候，数据在内核缓冲区和进程缓冲区之间交换，不等价于数据在内核缓冲区和磁盘之间的交换。</p>
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%A9%BA%E9%97%B4.png"></p>
+<h1 id="四种主要的-IO-模型"><a href="#四种主要的-IO-模型" class="headerlink" title="四种主要的 IO 模型"></a>四种主要的 IO 模型</h1><ul>
+<li>同步阻塞 IO (Blocking IO)</li>
+<li>同步非阻塞 IO (Non-Blocking IO)</li>
+<li>IO 多路复用 (IO Multiplexing)</li>
+<li>异步 IO (Asynchronous IO)</li>
+</ul>
+<h3 id="同步阻塞-IO-Blocking-IO"><a href="#同步阻塞-IO-Blocking-IO" class="headerlink" title="同步阻塞 IO (Blocking IO)"></a>同步阻塞 IO (Blocking IO)</h3><p>在 Linux 的 Java 进程中，默认情况下所有的 socket 都是 Blocking IO。在这种模型中，用户进程冲 IO 系统调用开始，一直到系统调用返回，这段时间都是阻塞的。</p>
+<p><img src="/images/%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9EIO.jpeg"></p>
+<p>BIO 特点：</p>
+<p>用户进程的线程发起系统调用，内核进行 IO 执行的两个阶段，用户线程都被阻塞了。 </p>
+<p>BIO 优点：</p>
+<p>程序简单，在阻塞等待数据期间，用户线程挂起，基本不会占用 CPU 资源。</p>
+<p>BIO 缺点：</p>
+<p>一般情况线，每个连接配置一个独立的线程，这在并发量小的情况下，没什么问题。但是，在高并发场景下，需要大量的线程来维护大量的连接，内存、线程切换开销会非常巨大，基本上，BIO 在高并发场景下是不可用的。</p>
+<h3 id="同步非阻塞-IO-None-Blocking-IO"><a href="#同步非阻塞-IO-None-Blocking-IO" class="headerlink" title="同步非阻塞 IO (None Blocking IO)"></a>同步非阻塞 IO (None Blocking IO)</h3><p>在 Linux 系统下，可以设置使 socket 变为 non-blocking IO，这种模型一旦开始系统调用，会出现以下两种情况：</p>
+<ol>
+<li>在内核缓冲区没有数据的情况下，系统调用立即返回，返回一个调用失败的信息。</li>
+<li>在内核缓冲区有数据的情况下，是阻塞的，直到数据从内核缓冲区复制进用户进程缓冲区，复制完成，系统调用返回成功。</li>
+</ol>
+<p><img src="/images/%E5%90%8C%E6%AD%A5%E9%9D%9E%E9%98%BB%E5%A1%9EIO.jpeg"></p>
+<p>NIO 特点：</p>
+<p>用户程序的线程需要不断的进行 IO 系统调用，轮询数据是否准备好，如果没有准备好，继续轮询，直到完成系统调用为止。</p>
+<p>NIO 优点：</p>
+<p>每次发起系统调用，在内核等待数据过程中可以立即返回，用户线程不会被阻塞，实时性较好。</p>
+<p>NIO 缺点：</p>
+<p>同一个线程，需要不断的重复发起系统调用，这种轮询，将会不断地询问内核，将占用大量的 CPU 时间，系统资源利用率较低。</p>
+<blockquote>
+<p>tips: 强调一下，Java NIO(New IO) 不是 IO 模型中的 NIO 模型，而是另外一种模型，叫做 IO 多路复用模型(IO Multiplexing)。</p>
+</blockquote>
+<h3 id="IO-多路复用-IO-Multiplexing"><a href="#IO-多路复用-IO-Multiplexing" class="headerlink" title="IO 多路复用 (IO Multiplexing)"></a>IO 多路复用 (IO Multiplexing)</h3><p>为了避免同步非阻塞中轮询等待的问题，出现了一种优化方案，这就是 IO 多路复用 (IO Multiplexing)。</p>
+<p>IO 多路复用模型，就是通过一种新的系统调用，一个进程可以监视多个文件描述符，一旦某个描述符就绪(一般是内核缓冲区可读/可写)，内核就能够通知程序进行相应的系统调用。</p>
+<p>目前支持 IO 多路复用的系统调用有 select、poll、epoll。select 系统调用在目前几乎所有的操作系统上都有支持，具有良好的跨平台性，epoll 系统调用是在 Linux2.6 内核中率先实现的，是 select 系统调用的 Linux 增强版本。</p>
+<p>IO 多路复用的基本原理：单个线程不断的轮询 select、poll、epoll 系统调用所负责的成百上千个 socket 连接，当某个或某些 socket 网络连接的数据到达了，就返回这些可以读写的连接。因此，通过一次 select、poll、epoll 系统调用，就能查询到可以读写的一个甚至成百上千个网络连接。</p>
+<p><img src="/images/IO%E5%A4%9A%E8%B7%AF%E5%A4%8D%E7%94%A8.jpeg"></p>
+<p>IO 多路复用特点：</p>
+<p>IO 多路复用，建立在操作系统内核能够提供多路分离系统调用 select、poll、epoll 的基础上，该模型下的程序需要用到两个系统调用，一个 select、poll、epoll 查询调用，一个 IO 读写调用。</p>
+<p>和 NIO 模型一样，IO 多路复用也需要轮询，负责 select、poll、epoll 查询调用的线程，需要不断的轮询，查出可以进行 IO 操作的连接，不同的是一次查询能查成百上千连接。</p>
+<p>另外，IO 多路复用和 NIO 是有关系的，对于每一个查询的 socket，一般都设置成 non-blocking，只是这一点对用户是透明的。</p>
+<p>IO 多路复用优点：</p>
+<p>可以同时处理成千上万个连接，与一条线程对应一个连接相比，系统不必创建线程，也不必维护这些线程，从而大大减少了系统的开销。</p>
+<p>IO 多路复用缺点：</p>
+<p>本质上，select、poll、epoll 系统调用，属于同步 IO，也是阻塞的，都需要在读写的数据就绪后，自己负责读写，也就是说这个读写过程是阻塞的。</p>
+<h3 id="异步-IO-Asynchronous-IO"><a href="#异步-IO-Asynchronous-IO" class="headerlink" title="异步 IO (Asynchronous IO)"></a>异步 IO (Asynchronous IO)</h3><p>为了优化掉最后一点阻塞，于是出现了异步 IO (Asynchronous IO)，简称为 AIO。</p>
+<p>异步 IO 的基本流程：用户线程发起系统调用，告知内核启动某个 IO 操作，内核立即将调用结果返回。同时，内核开始进行 IO 操作(包含数据准备、数据复制)，内核 IO 操作完成后，通知用户程序(信号、状态、回调函数等)，用户程序再进行后续的读写操作。</p>
+<p><img src="/images/%E5%BC%82%E6%AD%A5IO.jpeg"></p>
+<p>异步 IO 特点：</p>
+<p>在接收到用户线程的 IO 操作请求，内核准备数据、复制数据的两个阶段，用户线程都是非阻塞的，用户线程只有接收到内核的通知，才进行下一步的读写操作。</p>
+<p>异步 IO 缺点：</p>
+<p>需要完成事件的注册与传递，这需要底层操作系统提供大量的支持，去做大量的工作。</p>
+<p>目前来说，Windwos 系统下通过 IOCP 实现了真正的异步 IO，但是目前 Windows 系统很少作为百万级以上或者说高并发应用的服务器操作系统来使用。</p>
+<p>而在 Linux 系统下，异步 IO 在 2.6 版本才引入，目前并不完善。所以，这也是在 Linux 下，实现高并发网络编程时都是以 IO 多路复用为主。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>四种 IO 模型，理论上越往后，阻塞越少，效率也是最优。在四种 IO 模型中，前三种属于同步 IO，因为其中真正的 IO 操作将阻塞线程，只有最后一种，才是真正的异步 IO 模型，可惜目前 Linux 尚欠完善。</p>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2019/11/13/Java%20%E9%9B%86%E5%90%88%E6%A1%86%E6%9E%B6/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="hide pull-right" href="/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="Java NIO 原理"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
