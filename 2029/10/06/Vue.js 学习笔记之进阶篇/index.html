@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Vue.js 学习笔记之进阶篇 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="JavaScript,Vue.js," />
+  
+
+  <meta name="description" content="过渡 &amp; 动画 Vue 提供了 transition 的封装组件，在某些情形下，可以给任何元素和组件添加进入&#x2F;离开的过渡。 常用的过渡都是使用 CSS 过渡，CSS 过渡会自动应用某些过渡的类名，在这些类名下写对应的过渡 CSS 效果，详见: 过渡的类名。 CSS 动画用法同 CSS 过渡，区别是在动画中 v-enter 类名在节点插入 DOM 后不会立即删除，而是在 animatione">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue.js 学习笔记之进阶篇">
+<meta property="og:url" content="https://zhouxelf.com/2029/10/06/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BF%9B%E9%98%B6%E7%AF%87/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="过渡 &amp; 动画 Vue 提供了 transition 的封装组件，在某些情形下，可以给任何元素和组件添加进入&#x2F;离开的过渡。 常用的过渡都是使用 CSS 过渡，CSS 过渡会自动应用某些过渡的类名，在这些类名下写对应的过渡 CSS 效果，详见: 过渡的类名。 CSS 动画用法同 CSS 过渡，区别是在动画中 v-enter 类名在节点插入 DOM 后不会立即删除，而是在 animatione">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2029-10-06T13:54:12.000Z">
+<meta property="article:modified_time" content="2021-04-21T15:32:29.594Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Vue.js">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%BF%87%E6%B8%A1-amp-%E5%8A%A8%E7%94%BB"><span class="toc-text">过渡 &amp; 动画</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%8F%AF%E5%A4%8D%E7%94%A8%E6%80%A7-amp-%E7%BB%84%E5%90%88"><span class="toc-text">可复用性 &amp; 组合</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B7%A5%E5%85%B7"><span class="toc-text">工具</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%A7%84%E6%A8%A1%E5%8C%96"><span class="toc-text">规模化</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%93%8D%E5%BA%94%E5%BC%8F%E5%8E%9F%E7%90%86"><span class="toc-text">响应式原理</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Vue.js 学习笔记之进阶篇" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Vue.js 学习笔记之进阶篇</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2029.10.06</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="过渡-amp-动画"><a href="#过渡-amp-动画" class="headerlink" title="过渡 &amp; 动画"></a>过渡 &amp; 动画</h1><ol>
+<li>Vue 提供了 transition 的封装组件，在某些情形下，可以给任何元素和组件添加进入/离开的过渡。</li>
+<li>常用的过渡都是使用 CSS 过渡，CSS 过渡会自动应用某些过渡的类名，在这些类名下写对应的过渡 CSS 效果，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitions.html#%E8%BF%87%E6%B8%A1%E7%9A%84%E7%B1%BB%E5%90%8D">过渡的类名</a>。</li>
+<li>CSS 动画用法同 CSS 过渡，区别是在动画中 v-enter 类名在节点插入 DOM 后不会立即删除，而是在 animationend 事件触发时删除，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitions.html#CSS-%E5%8A%A8%E7%94%BB">CSS 动画</a>。</li>
+<li>使用自定义的过渡类名，Vue 的过渡系统和其他第三方的 CSS 动画库 Animate.css 结合的非常好，不需要自己写各种动画效果，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitions.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E8%BF%87%E6%B8%A1%E7%9A%84%E7%B1%BB%E5%90%8D">自定义过渡的类名</a>。</li>
+<li>过渡同样可以使用 JS 实现，配合动画库 Velocity.js 有较好的效果，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitions.html#JavaScript-%E9%92%A9%E5%AD%90">JavaScript 钩子</a>。</li>
+<li>Vue 提供了过渡模式，使过渡有一个较好的效果，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitions.html#%E8%BF%87%E6%B8%A1%E6%A8%A1%E5%BC%8F">过渡模式</a>。</li>
+<li>对于一个列表的过滤渲染，可以使用列表过渡，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitions.html#%E5%88%97%E8%A1%A8%E8%BF%87%E6%B8%A1">列表过渡</a>。</li>
+<li>对于一些数据元素本身，Vue 提供了状态过渡，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/transitioning-state.html">状态过渡</a>。</li>
+</ol>
+<h1 id="可复用性-amp-组合"><a href="#可复用性-amp-组合" class="headerlink" title="可复用性 &amp; 组合"></a>可复用性 &amp; 组合</h1><ol>
+<li>混入 (mixin) 提供了一种非常灵活的方式，来分发 Vue 组件中的可复用功能，一个混入对象可以包含任意组件选项，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/mixins.html">混入</a>。</li>
+<li>Vue 允许用户注册自定义指令，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/custom-directive.html">自定义指令</a>。</li>
+<li>绝大多数情况下，使用模板是合适的，但是对于一些情况，可能需要使用渲染函数来实现，Vue 提供了这种功能，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/render-function.html">渲染函数 &amp; JSX</a>。</li>
+<li>createElement 返回的告诉 Vue 页面上需要渲染什么样的节点，包括及其子节点的描述信息，我们把这样的节点描述为 <strong>虚拟节点(virtual node)<strong>，常简写为 <strong>VNode</strong>，</strong>虚拟 DOM</strong> 是我们对由 Vue 组件树建立起来的整个 VNode 树的称呼，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/render-function.html#%E8%8A%82%E7%82%B9%E3%80%81%E6%A0%91%E4%BB%A5%E5%8F%8A%E8%99%9A%E6%8B%9F-DOM">节点、树及虚拟 DOM</a>。</li>
+<li>插件通常用来为 Vue 添加全局功能，插件的功能范围没有严格的限制，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/plugins.html">插件</a>。</li>
+<li>Vue 允许自定义过滤器，可被用于一些常见的文本格式化,过滤器可以用在两个地方：双花括号插值和 v-bind 表达式，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/filters.html">过滤器</a>。</li>
+</ol>
+<h1 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h1><ol>
+<li>开发中基本都是单文件组件，一个 <a target="_blank" rel="noopener" href="https://codesandbox.io/s/o29j95wx9">Demo</a>，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/single-file-components.html">单文件组件</a>。</li>
+<li>关注点分离不等于文件类型分离。</li>
+<li>Vue 测试工具，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/testing.html">测试</a>。</li>
+<li>Vue 提供了 TypeScript 的支持，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/typescript.html">TypeScript支持</a>。</li>
+<li>Vue 生产环境一般需要做一些特别的配置，以提高访问效率，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/deployment.html">生产环境部署</a>。</li>
+</ol>
+<h1 id="规模化"><a href="#规模化" class="headerlink" title="规模化"></a>规模化</h1><ol>
+<li><a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/routing.html">路由</a>，对于大多数的单页面应用，都推荐使用官方支持的 <a target="_blank" rel="noopener" href="https://router.vuejs.org/zh/">Vue Router</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/state-management.html">状态管理</a>，由于状态零散地分布在许多组件和组件之间的交互中，大型应用复杂度也经常逐渐增长，为了解决这个问题，Vue 提供 <a target="_blank" rel="noopener" href="https://vuex.vuejs.org/zh/">Vuex</a>。</li>
+<li>Vuex 是 <a target="_blank" rel="noopener" href="https://facebook.github.io/flux/">Flux架构</a> 的实现之一，<a target="_blank" rel="noopener" href="https://github.com/reduxjs/reduxhttps://github.com/reduxjs/redux">Redux</a> 是 React 生态中最流行的 Flux 实现。 </li>
+<li><a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/ssr.html">服务端渲染</a> 可以解决 SPA 应用的 SEO 问题和首屏渲染慢的问题，知乎上的相关 <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/59578433">讨论</a>。</li>
+<li>永远不要将不可信任的内容（一般指用户提供的字符串）作为模板内容使用，其等价于执行任意的 JS 代码，易受到 XSS 攻击，如果使用服务端渲染，甚至可能导致服务器被攻破，为了避免此问题，<strong>应该确保 Vue 模板的内容始终是可信的且完全由自己掌控</strong>。</li>
+<li>如果需要展示用户提供的 HTML，可以使用 v-html，但要注意，永远不要认为用户提供的 HTML 是 100% 安全的，除非它是在一个 iframe 沙盒里或者应用中只有编写这些 HTML 的用户可以接触到它。除此之外，允许用户撰写其自己的 Vue 模板会带来类似的危险。</li>
+<li>注入 HTML、URL、CSS、JS 等安全相关知识，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/security.html">安全</a>。</li>
+</ol>
+<h1 id="响应式原理"><a href="#响应式原理" class="headerlink" title="响应式原理"></a>响应式原理</h1><ol>
+<li>当你把一个普通的 JavaScript 对象传入 Vue 实例作为 data 选项，Vue 将遍历此对象所有的 property，并使用 Object.defineProperty 把这些 property 全部转为 getter/setter，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/reactivity.html#%E5%A6%82%E4%BD%95%E8%BF%BD%E8%B8%AA%E5%8F%98%E5%8C%96">如何追踪变化</a>。</li>
+<li>由于 JS 的限制，Vue 不能检测数组和对象的变化，尽管如此还是有一些办法来回避这些限制并保证它们的响应性，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/reactivity.html#%E6%A3%80%E6%B5%8B%E5%8F%98%E5%8C%96%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">检测变化的注意事项</a>。</li>
+</ol>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2029/09/04/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="hide pull-right" href="/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="Vue.js 学习笔记之进阶篇"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

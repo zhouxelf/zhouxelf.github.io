@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Redis 复制 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Redis,Database,NoSQL," />
+  
+
+  <meta name="description" content="复制配置在分布式系统中为了解决单点问题，通常会把数据复制多个副本部署到其他机器，满足故障恢复和负载均衡等需求。 建立复制参与复制的 Redis 实例划分为主节点（master）和从节点（slave），默认情况下，Redis 都是主节点。每个主节点只能有一个主节点，而主节点可以同时具有多个从节点。复制的数据流是单向的，只能由主节点复制到从节点。 配置复制的方式有以下三种  在配置文件中加入 slav">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis 复制">
+<meta property="og:url" content="https://zhouxelf.com/2019/07/03/Redis%20%E5%A4%8D%E5%88%B6%E3%80%81%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%81%E9%99%84%E5%8A%A0%E5%8A%9F%E8%83%BD/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="复制配置在分布式系统中为了解决单点问题，通常会把数据复制多个副本部署到其他机器，满足故障恢复和负载均衡等需求。 建立复制参与复制的 Redis 实例划分为主节点（master）和从节点（slave），默认情况下，Redis 都是主节点。每个主节点只能有一个主节点，而主节点可以同时具有多个从节点。复制的数据流是单向的，只能由主节点复制到从节点。 配置复制的方式有以下三种  在配置文件中加入 slav">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-07-03T12:21:03.000Z">
+<meta property="article:modified_time" content="2021-04-21T15:32:29.685Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="Database">
+<meta property="article:tag" content="NoSQL">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6"><span class="toc-text">复制</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE"><span class="toc-text">配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E5%A4%8D%E5%88%B6"><span class="toc-text">建立复制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%AD%E5%BC%80%E5%A4%8D%E5%88%B6"><span class="toc-text">断开复制</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%93%E6%89%91"><span class="toc-text">拓扑</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-text">原理</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">持久化</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#RDB"><span class="toc-text">RDB</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E8%A7%A6%E5%8F%91"><span class="toc-text">手动触发</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="toc-text">优缺点</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AOF"><span class="toc-text">AOF</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-text">工作流程</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%99%84%E5%8A%A0%E5%8A%9F%E8%83%BD"><span class="toc-text">附加功能</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%85%A2%E6%9F%A5%E8%AF%A2%E5%88%86%E6%9E%90"><span class="toc-text">慢查询分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E9%85%8D%E7%BD%AE%E5%8F%82%E6%95%B0"><span class="toc-text">两个配置参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4"><span class="toc-text">命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis-Shell"><span class="toc-text">Redis Shell</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#redis-benchmark"><span class="toc-text">redis-benchmark</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E6%95%B0"><span class="toc-text">参数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pipeline-%E6%B5%81%E6%B0%B4%E7%BA%BF"><span class="toc-text">Pipeline 流水线</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95"><span class="toc-text">性能测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8E%9F%E7%94%9F%E6%89%B9%E9%87%8F%E5%91%BD%E4%BB%A4%E4%B8%8E-Pipeline-%E5%AF%B9%E6%AF%94"><span class="toc-text">原生批量命令与 Pipeline 对比</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8B%E5%8A%A1"><span class="toc-text">事务</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Lua-%E8%84%9A%E6%9C%AC"><span class="toc-text">Lua 脚本</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8-Redis-%E4%B8%AD%E4%BD%BF%E7%94%A8-Lua"><span class="toc-text">在 Redis 中使用 Lua</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%A1%E7%90%86-Lua-%E8%84%9A%E6%9C%AC"><span class="toc-text">管理 Lua 脚本</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Bitmaps"><span class="toc-text">Bitmaps</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4-1"><span class="toc-text">命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HyperLogLog"><span class="toc-text">HyperLogLog</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4-2"><span class="toc-text">命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85"><span class="toc-text">发布订阅</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4-3"><span class="toc-text">命令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GEO"><span class="toc-text">GEO</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4-4"><span class="toc-text">命令</span></a></li></ol></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Redis 复制、持久化、附加功能" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Redis 复制</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2019.07.03</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="复制"><a href="#复制" class="headerlink" title="复制"></a>复制</h1><h2 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h2><p>在分布式系统中为了解决单点问题，通常会把数据复制多个副本部署到其他机器，满足故障恢复和负载均衡等需求。</p>
+<h4 id="建立复制"><a href="#建立复制" class="headerlink" title="建立复制"></a>建立复制</h4><p>参与复制的 Redis 实例划分为主节点（master）和从节点（slave），默认情况下，Redis 都是主节点。每个主节点只能有一个主节点，而主节点可以同时具有多个从节点。复制的数据流是单向的，只能由主节点复制到从节点。</p>
+<p>配置复制的方式有以下三种</p>
+<ul>
+<li>在配置文件中加入 slaveof 项，随 Redis 启动生效</li>
+<li>在 redis-server 启动命令后加入 –slaveof 生效</li>
+<li>直接使用命令 slaveof 生效</li>
+</ul>
+<p>slaveof 配置都是在从节点发起的，可以使用 info replication 命令查看复制相关状态。</p>
+<h4 id="断开复制"><a href="#断开复制" class="headerlink" title="断开复制"></a>断开复制</h4><p>在从节点上执行 slaveof no one 命令断开与主节点的复制关系，从节点断开后数据会保留，只是无法再从主节点获取。</p>
+<p>命令 slaveof 还可以进行主节点的切换，但要注意，<strong>切换主节点会清空之前所有的数据</strong> 。</p>
+<h2 id="拓扑"><a href="#拓扑" class="headerlink" title="拓扑"></a>拓扑</h2><p>一主一从、一主多从、树状主从</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>复制过程大致分为 6 个过程：</p>
+<ol>
+<li>保存主节点信息</li>
+<li>主从建立 socket 连接</li>
+<li>发送 ping 命令</li>
+<li>权限验证</li>
+<li>同步数据集</li>
+<li>命令持续复制</li>
+</ol>
+<h1 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h1><p>Redis 支持 RDB 和 AOF 两种持久化机制，持久化功能有效的避免因进程退出造成的数据丢失问题，当下次重启时利用之前持久化的文件即可实现数据恢复。</p>
+<h2 id="RDB"><a href="#RDB" class="headerlink" title="RDB"></a>RDB</h2><p>RDB 持久化是把当前进程数据生成快照保存到硬盘的过程，触发 RDB 持久化的过程分为手动触发和自动触发。</p>
+<h4 id="手动触发"><a href="#手动触发" class="headerlink" title="手动触发"></a>手动触发</h4><p><strong>bgsave</strong> 该命令会 fork 一个子进程，RDB 的持久化过程由子进程完成，而且阻塞只发生在 fork 阶段，一般时间很短。</p>
+<p>save 命令会阻塞当前 Redis 服务，一般不采用。</p>
+<p>RDB 文件名和文件路径由配置项在 dir 和 dbfilename 指定，若要修改，可以使用 config set 动态修改。</p>
+<h4 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h4><p><strong>优点</strong></p>
+<ol>
+<li>RDB 是一个紧凑压缩的二进制文件，代表 Redis 在某个时间节点上的数据快照，非常适用于备份，全景复制等场景。</li>
+<li>Redis 加载 RDB 恢复数据远远快于 AOF 的方式。</li>
+</ol>
+<p><strong>缺点</strong></p>
+<ol>
+<li>RDB 方式数据没法做到实时持久化 / 秒级持久化，因为 bgsave 每次运行都要执行 fork 操作创建子进程，属于重量级操作，频繁执行成本过高。</li>
+<li>RDB 文件使用特定的二进制格式保存，存在老版本 Redis 无法兼容新版 RDB 格式的问题。</li>
+</ol>
+<h2 id="AOF"><a href="#AOF" class="headerlink" title="AOF"></a>AOF</h2><p>AOF（append only file） 持久化：以独立日志的方式记录每次写命令，重启时再重新执行 AOF 文件中的命令达到恢复数据的目的。AOF 是目前 Redis 持久化的主流方式。</p>
+<p>开启 AOF 功能需要设置配置：appendonly yes，默认不开启；AOF 文件名通过 appendfilename 配置，默认为 appendonly.aof；保存路径同样由 dir 指定。</p>
+<h4 id="工作流程"><a href="#工作流程" class="headerlink" title="工作流程"></a>工作流程</h4><ol>
+<li>命令写入（append）</li>
+<li>文件同步（sync）</li>
+<li>文件重写（rewrite）</li>
+<li>重启加载（load）</li>
+</ol>
+<p><strong>命令写入</strong></p>
+<p>AOF 命令写入会把所有的写入命令追加到 aof_buf（缓冲区），写入的内容直接是文本协议格式。</p>
+<p><strong>文件同步</strong></p>
+<p>Redis 提供了多种 AOF 缓冲区同步文件策略，由配置项 appendfsync 指定，可配置值有 always、everysec、no。eyerysec 是默认的配置值，也是建议的配置值，能做到兼顾性能和数据安全性。</p>
+<p><strong>重写机制</strong></p>
+<p>随着命令不断写入 AOF，文件会越来越大，为了解决这个问题，Redis 引入 AOF 重写机制压缩文件体积。</p>
+<blockquote>
+<p>重写后的 AOF 文件为什么可以变小？</p>
+</blockquote>
+<ol>
+<li>进程内已经超时的数据不再写入文件；</li>
+<li>旧的 AOF 文件含有无效命令，如 del key 等，重写使用进程内数据直接生成，这样新的 AOF 文件只保留最终数据的写入命令；</li>
+<li>多条写命令可以合并为一个。</li>
+</ol>
+<p>AOF 的重写过程有手动触发和自动触发两种方式</p>
+<ul>
+<li>手动触发 直接调用 bgrewriteaof 命令</li>
+<li>自动触发 根据 auto-aof-rewrite-min-size 和 auto-aof-rewrite-percentage 参数确定自动触发时机</li>
+</ul>
+<p><strong>重启加载</strong></p>
+<p>开启了 AOF 后，Redis 在服务重启时会自动加载 AOF 文件，将数据导入内存。</p>
+<h1 id="附加功能"><a href="#附加功能" class="headerlink" title="附加功能"></a>附加功能</h1><h2 id="慢查询分析"><a href="#慢查询分析" class="headerlink" title="慢查询分析"></a>慢查询分析</h2><p>慢查询日志是系统在命令执行前后计算每条命令的执行时间，当超过预设阀值，就将这条命令的相关信息（例如：发生时间，耗时，命令的详细信息）记录下来，Redis 也提供了类似的功能。</p>
+<h4 id="两个配置参数"><a href="#两个配置参数" class="headerlink" title="两个配置参数"></a>两个配置参数</h4><ul>
+<li>slowlog-log-slower-than 预设阀值，默认值 10000 微秒</li>
+<li>slowlog-max-len 允许日志存储的最大条数</li>
+</ul>
+<p>slowlog-max-len 是一个列表，当列表满时，第一条日志出列；两个配置可以通过 config set 来修改，如果要将配置写入配置文件，须执行 config rewrite 。</p>
+<h4 id="命令"><a href="#命令" class="headerlink" title="命令"></a>命令</h4><ul>
+<li>slowlog get 获取当前 redis 的慢查询</li>
+<li>slowlog len 获取当前慢查询日志列表的长度</li>
+<li>slowlog 慢查询日志重置</li>
+</ul>
+<h2 id="Redis-Shell"><a href="#Redis-Shell" class="headerlink" title="Redis Shell"></a>Redis Shell</h2><p>Redis 提供了 redis-server、redis-cli、redis-benchmark 等 Shell 工具。</p>
+<h4 id="redis-benchmark"><a href="#redis-benchmark" class="headerlink" title="redis-benchmark"></a>redis-benchmark</h4><p>redis-benchmark 可以为 Redis 做基准性能测试。</p>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ul>
+<li>-c 指定客户端的并发数量</li>
+<li>-n 指定所有客户端的请求总量</li>
+<li>-q 仅显示 requests per second 信息</li>
+<li>-t 对指定命令进行基准测试</li>
+</ul>
+<h2 id="Pipeline-流水线"><a href="#Pipeline-流水线" class="headerlink" title="Pipeline 流水线"></a>Pipeline 流水线</h2><p>发送命令和返回结果所耗费的时间称为 Round Trip Time（RTT，往返时间）。Pipeline 能将一组 Redis 命令进行组装，通过一次 RTT 传输给 Redis，再将这组 Redis 命令的执行结果按顺序返回给客户端。</p>
+<h4 id="性能测试"><a href="#性能测试" class="headerlink" title="性能测试"></a>性能测试</h4><ol>
+<li>Pipeline 执行速度一般比逐条执行要快</li>
+<li>客户端与服务器的网络时延越大，Pipeline 的效果越明显</li>
+</ol>
+<h4 id="原生批量命令与-Pipeline-对比"><a href="#原生批量命令与-Pipeline-对比" class="headerlink" title="原生批量命令与 Pipeline 对比"></a>原生批量命令与 Pipeline 对比</h4><ol>
+<li>原生批量命令是原子的，Pipeline 是非原子的</li>
+<li>原生批量命令是一个命令对应多个 key，Pipeline 支持多个命令</li>
+<li>原生批量命令是 Redis 服务端支持实现的，而 Pipeline 需要服务端和客户端的共同实现</li>
+</ol>
+<h2 id="事务"><a href="#事务" class="headerlink" title="事务"></a>事务</h2><p>为了保证多个命令组合的原子性，可以使用事务。</p>
+<p>multi 代表事务开始，exec 代表事务结束，命令执行。 </p>
+<h2 id="Lua-脚本"><a href="#Lua-脚本" class="headerlink" title="Lua 脚本"></a>Lua 脚本</h2><h4 id="在-Redis-中使用-Lua"><a href="#在-Redis-中使用-Lua" class="headerlink" title="在 Redis 中使用 Lua"></a>在 Redis 中使用 Lua</h4><ul>
+<li>eval </li>
+<li>evalsha</li>
+</ul>
+<h4 id="管理-Lua-脚本"><a href="#管理-Lua-脚本" class="headerlink" title="管理 Lua 脚本"></a>管理 Lua 脚本</h4><ul>
+<li>script load 将脚本加载到内存</li>
+<li>script exists 判断 sha1 是否加载</li>
+<li>script flush 清除加载的所有脚本</li>
+<li>script kill 杀掉正在执行的脚本</li>
+</ul>
+<h2 id="Bitmaps"><a href="#Bitmaps" class="headerlink" title="Bitmaps"></a>Bitmaps</h2><p>Bitmaps 不是一种数据结构类型，实际上就是字符串，可以对它的位进行操作。</p>
+<h4 id="命令-1"><a href="#命令-1" class="headerlink" title="命令"></a>命令</h4><ul>
+<li>setbit 设置值</li>
+<li>getbit 获取值</li>
+<li>bitcount 获取 Bitmaps 指定范围为 1 的个数</li>
+<li>bitop and | or | not | xor Bitmaps 间的运算</li>
+<li>bitpos 计算 Bitmaps 中第一个值为 0 | 1 的偏移量</li>
+</ul>
+<h2 id="HyperLogLog"><a href="#HyperLogLog" class="headerlink" title="HyperLogLog"></a>HyperLogLog</h2><p>HyperLogLog 也不是一种新的数据结构类型（实际类型为字符串类型），而是一种基数算法，通过 HyperLogLog 可以利用极小的内存空间完成独立总数的统计，数据集可以是 IP、Email、ID 等。</p>
+<ol>
+<li>只为了计算独立总数，不需要获取单条数据</li>
+<li>可以容忍一定的误差率</li>
+</ol>
+<h4 id="命令-2"><a href="#命令-2" class="headerlink" title="命令"></a>命令</h4><ul>
+<li>pfadd 添加元素</li>
+<li>pfcount 计算独立用户数</li>
+<li>prmerge 求几个 HyperLogLog 的并集</li>
+</ul>
+<h2 id="发布订阅"><a href="#发布订阅" class="headerlink" title="发布订阅"></a>发布订阅</h2><p>Redis 提供了基于 「发布/订阅」 模式的消息机制，此种模式下，消息发布者和订阅者不进行直接通信，发布者客户端向指定的频道（channel）发布消息，订阅该频道的每个客户端都可以收到该消息。</p>
+<h4 id="命令-3"><a href="#命令-3" class="headerlink" title="命令"></a>命令</h4><ul>
+<li>publish 向指定频道发布一条消息</li>
+<li>subscribe 订阅一个或多个频道</li>
+<li>unsubscribe 取消对指定频道的订阅</li>
+<li>psubscribe punsubscribe 按照频道订阅和取消订阅</li>
+<li>pubsub channels | numsub | numpat 查询 活跃的频道 | 频道订阅数 | 模式订阅数</li>
+</ul>
+<h2 id="GEO"><a href="#GEO" class="headerlink" title="GEO"></a>GEO</h2><p>Redis 3.2 版本提供了 GEO（地理信息定位）功能，支持存储地理位置信息来实现诸如附近位置、摇一摇这类依赖于地理位置信息的功能。GEO 的数据结构类型是 ZSet。</p>
+<h4 id="命令-4"><a href="#命令-4" class="headerlink" title="命令"></a>命令</h4><ul>
+<li>geoadd 添加地理位置信息，包括经度、纬度、地名</li>
+<li>geopos 获取地理位置信息</li>
+<li>geodist 获取两个地理位置的距离 m 米 | km 公里 | mi 英里 | ft 英尺</li>
+<li>georadius georadiusbymember 获取指定位置范围内的地理信息位置集合</li>
+<li>geohash 获取 geohash，Redis 使用 geohash 将二维经纬度转换为一维字符串</li>
+<li>zrem 删除地理位置信息</li>
+</ul>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2019/05/11/Redis%20%E5%9F%BA%E7%A1%80/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2019/08/12/JavaScript%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="Redis 复制"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
