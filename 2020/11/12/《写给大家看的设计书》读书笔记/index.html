@@ -7,7 +7,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>理解同步、异步、阻塞、非阻塞 | 潜心做事</title>
+  <title>《写给大家看的设计书》读书笔记 | 潜心做事</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -17,13 +17,13 @@
 
   <meta name="description" content="设计原则一旦能够说出什么东西的名字，就会很容易注意到它，就会掌握它，拥有它，让它受你所控。 有关设计(同时也是有关生活)的一个更一般的指导原则是：不要畏畏缩缩。  不要害怕在设计(或生活)中留有空白，这能让你的眼睛(以及心灵)稍作休息。 不要害怕设计是不对称的，使用非居中的格式，不居中往往能使效果更强烈。尽管不建议使用居中，不过有意这么做也无不可。 不要害怕把单词设置得非常大或非常小，不要担心说话">
 <meta property="og:type" content="article">
-<meta property="og:title" content="理解同步、异步、阻塞、非阻塞">
+<meta property="og:title" content="《写给大家看的设计书》读书笔记">
 <meta property="og:url" content="https://zhouxelf.com/2020/11/12/%E3%80%8A%E5%86%99%E7%BB%99%E5%A4%A7%E5%AE%B6%E7%9C%8B%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B9%A6%E3%80%8B%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="潜心做事">
 <meta property="og:description" content="设计原则一旦能够说出什么东西的名字，就会很容易注意到它，就会掌握它，拥有它，让它受你所控。 有关设计(同时也是有关生活)的一个更一般的指导原则是：不要畏畏缩缩。  不要害怕在设计(或生活)中留有空白，这能让你的眼睛(以及心灵)稍作休息。 不要害怕设计是不对称的，使用非居中的格式，不居中往往能使效果更强烈。尽管不建议使用居中，不过有意这么做也无不可。 不要害怕把单词设置得非常大或非常小，不要担心说话">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-11-12T13:16:23.000Z">
-<meta property="article:modified_time" content="2021-04-20T13:48:54.768Z">
+<meta property="article:modified_time" content="2021-04-21T13:57:13.570Z">
 <meta property="article:author" content="zhouxelf">
 <meta property="article:tag" content="读书笔记">
 <meta name="twitter:card" content="summary">
@@ -138,7 +138,7 @@
 
   <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="toc-text">设计原则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%B2%E5%AF%86%E6%80%A7"><span class="toc-text">亲密性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">要避免的问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%B9%E9%BD%90"><span class="toc-text">对齐</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-1"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98-1"><span class="toc-text">要避免的问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%87%8D%E5%A4%8D"><span class="toc-text">重复</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-2"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98-2"><span class="toc-text">要避免的问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94"><span class="toc-text">对比</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-3"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98-3"><span class="toc-text">要避免的问题</span></a></li></ol></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="toc-text">设计原则</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BA%B2%E5%AF%86%E6%80%A7"><span class="toc-text">亲密性</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-text">要避免的问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%B9%E9%BD%90"><span class="toc-text">对齐</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-1"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98-1"><span class="toc-text">要避免的问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%87%8D%E5%A4%8D"><span class="toc-text">重复</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-2"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98-2"><span class="toc-text">要避免的问题</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AF%B9%E6%AF%94"><span class="toc-text">对比</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0-3"><span class="toc-text">如何实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A6%81%E9%81%BF%E5%85%8D%E7%9A%84%E9%97%AE%E9%A2%98-3"><span class="toc-text">要避免的问题</span></a></li></ol></li></ol>
   </div>
 
 
@@ -146,7 +146,7 @@
 <div class="content content-post CENTER">
    <article id="post-《写给大家看的设计书》读书笔记" class="article article-type-post" itemprop="blogPost">
   <header class="article-header">
-    <h1 class="post-title">理解同步、异步、阻塞、非阻塞</h1>
+    <h1 class="post-title">《写给大家看的设计书》读书笔记</h1>
 
     <div class="article-meta">
       <span>
@@ -201,8 +201,8 @@
 </ul>
 <h1 id="亲密性"><a href="#亲密性" class="headerlink" title="亲密性"></a>亲密性</h1><p>亲密性原则是指：<strong>将相互关联的项组织在一起</strong>，移动这些项，使它们的物理位置相互靠近，这样以来，相关的项将被看作凝聚为一体的一个组，而不再是一堆彼此无关的片段。</p>
 <p>如果某些元素在理解上存在关联，或者相互之间存在某种关系，那么这些元素在视觉上也应该有关联。除此之外，其他孤立的元素或元素组则不应该存在亲密性。位置是否靠近可以体现元素之间是否存在关系。</p>
-<h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><p>微微眯起眼睛，统计眼睛停顿的次数来数一数页面上有多少个元素。如果页面上的项超过 3～5 个(当然，这取决于具体情况)，就要看看哪些孤立的元素可以归为一组建议更近的亲密性，使之成为一个视觉单元。</p>
-<h3 id="要避免的问题"><a href="#要避免的问题" class="headerlink" title="要避免的问题"></a>要避免的问题</h3><ul>
+<h2 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h2><p>微微眯起眼睛，统计眼睛停顿的次数来数一数页面上有多少个元素。如果页面上的项超过 3～5 个(当然，这取决于具体情况)，就要看看哪些孤立的元素可以归为一组建议更近的亲密性，使之成为一个视觉单元。</p>
+<h2 id="要避免的问题"><a href="#要避免的问题" class="headerlink" title="要避免的问题"></a>要避免的问题</h2><ul>
 <li>避免一个页面上有太多孤立的元素。</li>
 <li>不要在元素之间留出同样大小的空白，除非各组同属于一个子集。</li>
 <li>标题、子标题、图表标题、图片能否归入相关材料？在这个问题上一定要非常清楚，哪怕只有一点含糊都要尽量避免。在有很近亲密性的元素之间建立关系。</li>
@@ -211,21 +211,21 @@
 </ul>
 <h1 id="对齐"><a href="#对齐" class="headerlink" title="对齐"></a>对齐</h1><p>对齐原则是指：<strong>任何元素都不能在页面上随意安放，每一项都应当与页面上的某个内容存在某种视觉联系</strong>。对齐原则要求特别小心，再不能像从前那样，只要页面上刚好有空间就把元素随意 <strong>扔</strong> 到那里。</p>
 <p>在得到更多培训之前，一定要坚持一个原则：<strong>只使用一种对齐方式</strong>。页面上只使用一种文本对齐，所有文本都左对齐，或右对齐，或者全部居中。</p>
-<h3 id="如何实现-1"><a href="#如何实现-1" class="headerlink" title="如何实现"></a>如何实现</h3><p>要特别注意元素放在哪里，应当总能在页面上找到与之对齐的元素，尽管这两个对象的物理位置可能相距很远。</p>
-<h3 id="要避免的问题-1"><a href="#要避免的问题-1" class="headerlink" title="要避免的问题"></a>要避免的问题</h3><ul>
+<h2 id="如何实现-1"><a href="#如何实现-1" class="headerlink" title="如何实现"></a>如何实现</h2><p>要特别注意元素放在哪里，应当总能在页面上找到与之对齐的元素，尽管这两个对象的物理位置可能相距很远。</p>
+<h2 id="要避免的问题-1"><a href="#要避免的问题-1" class="headerlink" title="要避免的问题"></a>要避免的问题</h2><ul>
 <li>要避免在页面上混合使用多种文本对齐方式，也就是说，不要将某些文本居中，而另外一些文本右对齐。</li>
 <li><strong>要着力避免居中对齐</strong>，除非你有意识地想要创建一种比较正式、稳重(通常也更乏味)的表示。并不是完全杜绝使用居中对齐，有时可以有意地选择这种对齐方式，但是不要把它作为默认选择。</li>
 </ul>
 <h1 id="重复"><a href="#重复" class="headerlink" title="重复"></a>重复</h1><p>重复原则是指：<strong>设计的某些方面需要在整个作品中重复</strong>。重复元素可能是一种粗字体、一条粗线、某个项目符号、颜色、设计原则、颜色、设计要素、某种格式、空间关系等。读者能看到的任何方面都可以作为重复元素。</p>
-<h3 id="如何实现-2"><a href="#如何实现-2" class="headerlink" title="如何实现"></a>如何实现</h3><p>重复可以认为是保持一致性，而且我相信你早已经这样做过。现在，<strong>需要把现有的一致性更向前推进一步</strong>。</p>
-<h3 id="要避免的问题-2"><a href="#要避免的问题-2" class="headerlink" title="要避免的问题"></a>要避免的问题</h3><ul>
+<h2 id="如何实现-2"><a href="#如何实现-2" class="headerlink" title="如何实现"></a>如何实现</h2><p>重复可以认为是保持一致性，而且我相信你早已经这样做过。现在，<strong>需要把现有的一致性更向前推进一步</strong>。</p>
+<h2 id="要避免的问题-2"><a href="#要避免的问题-2" class="headerlink" title="要避免的问题"></a>要避免的问题</h2><ul>
 <li>要避免太多地重复一个元素，重复太多会让人讨厌，要注意对比的价值。</li>
 </ul>
 <h1 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h1><p>对比原则是指：<strong>页面的不同元素之间要有对比效果，达到吸引读者的对比效果</strong>。如果两个项不完全相同，就应当使之不同，而且应当是截然不同。</p>
 <p>对比不仅可以用来吸引眼球，还可以用来组织信息、清晰层级、在页面上指引读者，并且制造焦点。</p>
 <p>记住一个重要规则：要实现有效的对比，对比就必须强烈，千万不要畏畏缩缩。</p>
-<h3 id="如何实现-3"><a href="#如何实现-3" class="headerlink" title="如何实现"></a>如何实现</h3><p>可以通过字体选择、线宽、形状、大小、空间等来增加对比。增加对比很容易，途径有很多，这可能是增加视觉效果更有意思也更加让人满意的地方了。重要的是：<strong>对比一定要强烈</strong>。</p>
-<h3 id="要避免的问题-3"><a href="#要避免的问题-3" class="headerlink" title="要避免的问题"></a>要避免的问题</h3><ul>
+<h2 id="如何实现-3"><a href="#如何实现-3" class="headerlink" title="如何实现"></a>如何实现</h2><p>可以通过字体选择、线宽、形状、大小、空间等来增加对比。增加对比很容易，途径有很多，这可能是增加视觉效果更有意思也更加让人满意的地方了。重要的是：<strong>对比一定要强烈</strong>。</p>
+<h2 id="要避免的问题-3"><a href="#要避免的问题-3" class="headerlink" title="要避免的问题"></a>要避免的问题</h2><ul>
 <li>不要犹豫。如果你想形成对比，就加大力度。不要将一种粗线与一种更粗的线进行对比。不要将棕色文本和黑色标题建立对比。要避免使用两种多种类似的字体。如果各个项不完全一样，干脆让它们截然不同。</li>
 </ul>
 <p><br><br></p>
@@ -342,7 +342,7 @@
 
     
   <section id="changyan-comments">
-    <div id="SOHUCS" sid="理解同步、异步、阻塞、非阻塞"></div>
+    <div id="SOHUCS" sid="《写给大家看的设计书》读书笔记"></div>
     <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
     <script type="text/javascript">
       window.changyan.api.config({

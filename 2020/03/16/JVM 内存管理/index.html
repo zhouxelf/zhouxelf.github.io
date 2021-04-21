@@ -24,7 +24,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://zhouxelf.com/images/JDK8_JVM.jpeg">
 <meta property="article:published_time" content="2020-03-16T12:15:23.000Z">
-<meta property="article:modified_time" content="2021-04-20T09:52:03.199Z">
+<meta property="article:modified_time" content="2021-04-21T14:00:35.614Z">
 <meta property="article:author" content="zhouxelf">
 <meta property="article:tag" content="Java">
 <meta property="article:tag" content="JVM">
@@ -141,7 +141,7 @@
 
   <div id="toc" class="toc-article">
     <strong class="toc-title">文章目录</strong>
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#JVM-%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84"><span class="toc-text">JVM 内存结构</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E9%9A%94%E7%A6%BB%E5%8C%BA%E5%9F%9F%EF%BC%88%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%8C%BA%EF%BC%89"><span class="toc-text">线程隔离区域（线程安全区）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E5%8C%BA%E5%9F%9F%EF%BC%88%E7%BA%BF%E7%A8%8B%E9%9D%9E%E5%AE%89%E5%85%A8%E5%8C%BA%EF%BC%89"><span class="toc-text">线程共享区域（线程非安全区）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-text">方法区</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98"><span class="toc-text">直接内存</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">常见的垃圾收集器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">分代收集器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%8C%BA%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">分区收集器</span></a></li></ol></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JVM-%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84"><span class="toc-text">JVM 内存结构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E9%9A%94%E7%A6%BB%E5%8C%BA%E5%9F%9F%EF%BC%88%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%8C%BA%EF%BC%89"><span class="toc-text">线程隔离区域（线程安全区）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E5%8C%BA%E5%9F%9F%EF%BC%88%E7%BA%BF%E7%A8%8B%E9%9D%9E%E5%AE%89%E5%85%A8%E5%8C%BA%EF%BC%89"><span class="toc-text">线程共享区域（线程非安全区）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-text">方法区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E5%86%85%E5%AD%98"><span class="toc-text">直接内存</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">常见的垃圾收集器</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E4%BB%A3%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">分代收集器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E5%8C%BA%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-text">分区收集器</span></a></li></ol></li></ol>
   </div>
 
 
@@ -187,7 +187,7 @@
 
   <div class="article-content">
     
-      <h2 id="JVM-内存结构"><a href="#JVM-内存结构" class="headerlink" title="JVM 内存结构"></a>JVM 内存结构</h2><p>JVM 在执行 Java 程序的过程中，会把它管理的内存划分为几个不同的数据区域，这些区域都有各自的用途、创建时间、销毁时间。</p>
+      <h1 id="JVM-内存结构"><a href="#JVM-内存结构" class="headerlink" title="JVM 内存结构"></a>JVM 内存结构</h1><p>JVM 在执行 Java 程序的过程中，会把它管理的内存划分为几个不同的数据区域，这些区域都有各自的用途、创建时间、销毁时间。</p>
 <ul>
 <li>寄存器：最开的存储区，由编译器根据需求进行分配，在程序中无法控制。</li>
 <li>栈：存放基本类型的变量和对象的引用，对象本身不存放在栈中。</li>
@@ -202,7 +202,7 @@
 <p>对于字符串，其对象的引用都是存储在栈中的，如果是编译期就已经创建好的（直接双引号定义）就存储在常量池中，如果是运行期才能确定的（new 出来的）就存储在堆中。对于 equals 相等的字符串，在常量池中永远只有一份，在堆中有多份。</p>
 <p><strong>JDK8 JVM 分代图</strong></p>
 <p><img src="/images/JDK8_JVM.jpeg"></p>
-<h4 id="线程隔离区域（线程安全区）"><a href="#线程隔离区域（线程安全区）" class="headerlink" title="线程隔离区域（线程安全区）"></a>线程隔离区域（线程安全区）</h4><ul>
+<h2 id="线程隔离区域（线程安全区）"><a href="#线程隔离区域（线程安全区）" class="headerlink" title="线程隔离区域（线程安全区）"></a>线程隔离区域（线程安全区）</h2><ul>
 <li><p>程序计数器：多线程执行过程中，当前线程正在执行的字节码指令的行号指示器，分支、循环、跳转、异常处理、线程恢复等基础工程都需要依赖这个计数器来完成。该内存区域是虚拟机中没有规定任何 OutOfMemory Error 情况的区域，因为程序运行过程中，计数器中改变的只是值，而不会随着程序的运行需要更大的空间。</p>
 </li>
 <li><p>虚拟机栈：虚拟机栈存放当前正在执行方法所需要的数据、地址、指令。每个线程都会独享一块栈空间，每次方法调用都会创建一个栈帧，栈帧保存了方法的局部变量、操作数栈、动态链接、出口等信息。栈帧的深度是有限的，超过限制会抛出 StackOverflow Error 异常。</p>
@@ -210,7 +210,7 @@
 <li><p>本地方法栈：本地方法是指在 JDK 中那些被 native 关键字修饰的方法。这类方法有点类似于 Java 中的接口，没有实现体，但实际上是由 JVM 在加载时调用底层实现的，实现体由非 Java 语言实现（如 C、C++），所以本地方法可以认为是连接 Java 代码和其它语言实现代码的入口。本地方法栈的功能类似于虚拟机栈，只是一个服务于 Java 方法，一个服务于本地方法。</p>
 </li>
 </ul>
-<h4 id="线程共享区域（线程非安全区）"><a href="#线程共享区域（线程非安全区）" class="headerlink" title="线程共享区域（线程非安全区）"></a>线程共享区域（线程非安全区）</h4><ul>
+<h2 id="线程共享区域（线程非安全区）"><a href="#线程共享区域（线程非安全区）" class="headerlink" title="线程共享区域（线程非安全区）"></a>线程共享区域（线程非安全区）</h2><ul>
 <li>堆：存放创建对象的实例。堆区域在 JVM 中是非常重要的一块区域，这个区域几乎是被所有的线程所共享，同时也是 JVM 管理内存中最大的一块。</li>
 </ul>
 <p>当代主流虚拟机（Hotspot VM）的垃收集都采用「分代回收」的算法，「分代回收」基于这样一个事实：对象的生命周期不同，所以针对不同生命周期的对象可以采用不同的回收方式，以便提高回收效率。</p>
@@ -228,19 +228,19 @@
 <blockquote>
 <p><code>注: 永久代在 JDK8 时被移除，取而代之的称为元空间</code>。</p>
 </blockquote>
-<h4 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h4><p>jdk8 废除的是永久代的概念，并不是方法区。</p>
+<h2 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h2><p>jdk8 废除的是永久代的概念，并不是方法区。</p>
 <p>JVM 的虚拟机规范只规定了有方法区这个概念和作用，并没有规定如何实现它。不同的 JVM 方法区的实现会不一样，比如在 HotSpot 虚拟机中使用永久代实现方法区，其它 JVM 并没有永久代的概念。方法区是一种规范，永久代是一种实现。</p>
 <p>我们经常说的永久代是方法区的一种实现，并且只在 HotSpot 虚拟机中有这种概念。JDK8（HotSpot 虚拟机）之前的版本经常碰到永久代溢出的异常 java.lang.OutOfMemeryError: PermGen space，这里的 PermGen space 指的就是永久代。在 JDK6 中，永久代包含方法区和常量池，但是在 jdk7 中规划去除永久代，于是在 JDK7 时将常量池移到了老年代。而在 JDK8<br>中彻底废除了永久代，取而代之的是元空间（Meta space）。</p>
-<h4 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h4><p>JDK8 之前，永久代设置太大，浪费资源，设置太小，容易溢出，并且永久代的 GC 效率很低。</p>
+<h2 id="直接内存"><a href="#直接内存" class="headerlink" title="直接内存"></a>直接内存</h2><p>JDK8 之前，永久代设置太大，浪费资源，设置太小，容易溢出，并且永久代的 GC 效率很低。</p>
 <p>于是 JDK8 中彻底废除了永久代，取而代之是元空间（Meta Space）。元空间的本质和永久代类似，都是对 JVM 规范中方法区的实现。元空间在非堆上，属于本地内存，不受 JVM 控制，也不会发生永久代溢出的异常。</p>
-<h2 id="常见的垃圾收集器"><a href="#常见的垃圾收集器" class="headerlink" title="常见的垃圾收集器"></a>常见的垃圾收集器</h2><p>目前在 Hotspot VM 中主要有分代收集和分区收集两大类，未来会逐渐向分区收集发展。</p>
-<h4 id="分代收集器"><a href="#分代收集器" class="headerlink" title="分代收集器"></a>分代收集器</h4><ul>
+<h1 id="常见的垃圾收集器"><a href="#常见的垃圾收集器" class="headerlink" title="常见的垃圾收集器"></a>常见的垃圾收集器</h1><p>目前在 Hotspot VM 中主要有分代收集和分区收集两大类，未来会逐渐向分区收集发展。</p>
+<h2 id="分代收集器"><a href="#分代收集器" class="headerlink" title="分代收集器"></a>分代收集器</h2><ul>
 <li>Serial：串行收集器是单线程的一个收集器，简单、易实现、效率高。</li>
 <li>ParNew：一款 Serial 多线程版的收集器，采用复制算法，主要工作在 Young 区，可以通过 -XX:ParallelGCThreads 参数来控制收集的线程数，整个过程都是 STW 的，常与 CMS 组合使用。</li>
 <li>Parallel Scavenge：吞吐量优先收集器，侧重于吞吐量的控制。</li>
 <li>CMS（Concurrent Mark Sweep）： 并发标记清除收集器以获取最短回收停顿时间为目标，采用「标记-清除」算法，分 4 大步进行垃圾收集，其中初始标记和重新标记会 STW ，多数应用于互联网站或者 B/S 系统的服务器端上，JDK9 被标记弃用，JDK14 被删除。</li>
 </ul>
-<h4 id="分区收集器"><a href="#分区收集器" class="headerlink" title="分区收集器"></a>分区收集器</h4><ul>
+<h2 id="分区收集器"><a href="#分区收集器" class="headerlink" title="分区收集器"></a>分区收集器</h2><ul>
 <li>G1：一种服务器端的垃圾收集器，应用在多服务器和大容量内存环境中，在实现高吞吐量的同时，尽可能地满足垃圾收集暂停时间的要求。</li>
 <li>ZGC：JDK11 中推出的一款低延迟垃圾回收器，适用于大内存低延迟服务的内存管理和回收，SPECjbb 2015 基准测试，在 128G 的大堆下，最大停顿时间才 1.68ms，停顿时间远胜于 G1 和 CMS。</li>
 <li>Shenandoah：由 Red Hat 的一个团队负责开发，与 G1 类似，基于 Region 设计的垃圾收集器，但不需要 Remember Set 或者 Card Table 来记录跨 Region 引用，停顿时间和堆的大小没有任何关系，停顿时间和 ZGC 类似。</li>
@@ -257,7 +257,7 @@
 
    
   <div class="box-prev-next clearfix">
-    <a class="show pull-left" href="/2020/01/10/Java%20NIO%20%E5%8E%9F%E7%90%86/">
+    <a class="show pull-left" href="/2020/03/16/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/">
         <i class="icon icon-angle-left"></i>
     </a>
     <a class="show pull-right" href="/2020/05/11/Redis%20%E5%9F%BA%E7%A1%80/">
