@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Vue.js 学习笔记之基础篇 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="JavaScript,Vue.js," />
+  
+
+  <meta name="description" content="基础 当 Vue 实例被创建时就已经存在于 data 中的属性才是响应式的。 不要在属性或回调上使用箭头函数，箭头函数没有 this。 Vue 提供一系列生命周期钩子函数供调用，created、mounted、destroyed 等。 不要在模版表达式中访问用户自定义的全局变量。 一些指令可以接收一个参数，在指令名称之后以冒号表示，比如 v-bind:href&#x3D;”url”、v-on:click&#x3D;”">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vue.js 学习笔记之基础篇">
+<meta property="og:url" content="https://zhouxelf.com/2020/09/04/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="基础 当 Vue 实例被创建时就已经存在于 data 中的属性才是响应式的。 不要在属性或回调上使用箭头函数，箭头函数没有 this。 Vue 提供一系列生命周期钩子函数供调用，created、mounted、destroyed 等。 不要在模版表达式中访问用户自定义的全局变量。 一些指令可以接收一个参数，在指令名称之后以冒号表示，比如 v-bind:href&#x3D;”url”、v-on:click&#x3D;”">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-09-04T14:05:03.000Z">
+<meta property="article:modified_time" content="2021-04-21T15:17:14.061Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="JavaScript">
+<meta property="article:tag" content="Vue.js">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80"><span class="toc-text">基础</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BB%84%E4%BB%B6"><span class="toc-text">组件</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Vue.js 学习笔记之基础篇" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Vue.js 学习笔记之基础篇</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.09.04</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h1><ol>
+<li>当 Vue 实例被创建时就已经存在于 data 中的属性才是响应式的。</li>
+<li>不要在属性或回调上使用箭头函数，箭头函数没有 this。</li>
+<li>Vue 提供一系列生命周期钩子函数供调用，created、mounted、destroyed 等。</li>
+<li>不要在模版表达式中访问用户自定义的全局变量。</li>
+<li>一些指令可以接收一个参数，在指令名称之后以冒号表示，比如 v-bind:href=”url”、v-on:click=”doSomething”。</li>
+<li>Vue 2.6.0 开始，可以使用动态参数，比如 v-bind:[attrname]=”url”、v-on:[eventname]=”doSomething”，注意 避免使用大写字符来命名键名。</li>
+<li>修饰符指明以特殊方式绑定，比如 v-on:submit.prevent=”onSubmit”，.prevent 修饰符告诉 v-on 指令对于触发的事件调用 event.preventDefault()。</li>
+<li>指令缩写，v-bind:href=”url” =&gt; :href=”url” 动态参数 :[key]=”url”，v-on:click=”doSomething” =&gt; @click=”doSomething” 动态参数 @[event]=”doSomething”。</li>
+<li>对于一些复杂的且需要在多个地方用到的属性计算逻辑，推荐使用 计算属性 computed。</li>
+<li>可以像普通属性一样在模板绑定计算属性，计算属性的值依赖于原始值，原始值变，计算属性跟着变。</li>
+<li>计算属性完全可以用方法实现，但是<strong>计算属性是基于它们的响应式依赖进行缓存的</strong>，只在相关的响应式依赖改变时才会重新计算求值，但是换成方法实现的话每次都会执行，如果不希望有缓存，请使用方法实现。</li>
+<li>需要数据在变化时执行异步或开销较大的操作时，可以使用侦听器 watch。</li>
+<li>v-bind 用于 class 和 style 时，表达式的结果除了字符串，还可以是对象、数组或计算属性。</li>
+<li>v-bind:style 的值是一个 JS 对象，CSS 的属性使用驼峰命名访问。</li>
+<li>条件渲染，如果想切换多个元素，可以使用 <code>&lt;template&gt;</code> 元素包裹多个元素，然后在 template 上使用 v-if 指令。</li>
+<li>不需要复用的元素，可以显示的使用 key 来声明。</li>
+<li>v-if 和 v-show 指令都可以用来控制展示元素，不同的是，v-show 的元素始终会被渲染并保留在 DOM 中，v-show 只是简单的切换元素的 CSS 属性 display。</li>
+<li>v-show 不支持 <code>&lt;template&gt;</code> 元素，也不支持 v-else。</li>
+<li>v-if 是真正的条件渲染，它会确保切换过程中条件块内的事件监听器和子组件适当地重建或销毁。</li>
+<li>v-if 也是惰性的，如果初始条件为假，则什么也不做，知道条件第一次为真时才渲染。</li>
+<li>v-show 不管初始条件如何，始终被渲染，只是进行简单的基于 CSS 进行切换。</li>
+<li>如果选择？v-if 有更高的切换开销，而 v-show 有更高的初始渲染开销。如果频繁切换，使用 v-show，如果运行时条件很少改变，使用 v-if。</li>
+<li><strong>不推荐</strong>同时使用 v-if 和 v-for，如果一起使用，v-for 具有比 v-if 更高的优先级。</li>
+<li>v-for 遍历数组时，支持一个可选的第二个参数，即当前项的索引 index。</li>
+<li>v-for 遍历对象时，支持一个可选的第二个参数，即当前项的键名 key，支持一个可选的第三个参数，即当前项的索引 index。</li>
+<li>尽可能在使用 v-for 时绑定 :key 属性，不要使用数组或对象之类的非基本类型值作为 v-for 的 key，请用字符串或数值类型的值，注: Vue 2.2.0+ 版本里，当在组件上使用 v-for 时，key 是必须的。</li>
+<li><strong>变更方法</strong> Vue 将被监听的数组的变更方法进行了包裹，使用这些数组方法也会触发视图更新，这些方法包括: push()、pop()、shift()、unshift()、splice()、sort()、reverse()。</li>
+<li><strong>非变更方法</strong>，总是返回一个新数组，所以不会触发视图更新，如果想做到触发视图更新，可以用把返回的新数组赋值到旧数组。</li>
+<li>显示一个数组经过过滤或排序后的版本，而不改变原始数组，这是可以使用计算属性，来返回过滤或排序后的数组。</li>
+<li>类似于 v-if，可以利用带有 v-for 的 <code>&lt;template&gt;</code> 元素来循环渲染一段包含多个元素的内容。</li>
+<li>v-on 事件处理中，如果方法无参数，可以使用 event 访问原生 DOM 事件，如果有参数，可以在方法调用时显式地传递 $event 参数来访问原生 DOM 事件。</li>
+<li>事件修饰符，Vue 为 v-on 提供了事件修饰符，详见 <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/events.html#%E4%BA%8B%E4%BB%B6%E4%BF%AE%E9%A5%B0%E7%AC%A6">事件修饰符</a>。</li>
+<li>按键修饰符，Vue 允许为 v-on 在监听键盘事件时添加按键修饰符，详见 <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/events.html#%E6%8C%89%E9%94%AE%E4%BF%AE%E9%A5%B0%E7%AC%A6">按键修饰符</a>。</li>
+<li>v-model 指令在 <code>&lt;input&gt;</code>、<code>&lt;textarea&gt;</code> 及 <code>&lt;select&gt;</code> 元素上创建双向数据绑定，它会根据控件类型自动选取正确的方法来更新元素。</li>
+<li>v-model 会忽略所有表单元素的 value、checked、selected 属性的初始值，而总是将 Vue 实例的数据作为数据来源。</li>
+<li>v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件，text 和 textarea 元素使用 value 属性和 input 事件，checkbox 和 radio 使用 checked 属性和 change 事件，select 将 value 作为 prop 并将 change 作为事件。</li>
+<li>如果想把值绑定到 Vue 实例的一个动态属性上，可以使用 v-bind 实现，并且这个属性可以不是字符串。</li>
+<li>修饰符，v-model 在每次 input 事件触发后同步数据，可以使用 v-model.lazy，从而转为在 change 事件之后触发。</li>
+<li>如果需要自动将用户的输入值转换为数值类型，可以使用 v-model.number。</li>
+<li>如果需要自动过滤用户输入的首尾空白字符，可以使用 v-model.trim。</li>
+<li>组件是可复用的 Vue 实例，所以它们与 new Vue 接收相同的选项，例如 data、computed、watch、methods 以及生命周期钩子等，仅有的例外是像 el 这样的选项是根实例特有的。</li>
+<li>一个组件的 data 选项必须是一个函数。</li>
+<li>组件分为全局注册和局部注册，全局注册的组件可以用在其被注册之后的任何（通过 new Vue）新创建的 Vue 根实例，也包括其组件树的所有子组件的模块中。</li>
+<li>可以使用 Prop 向子组件传递数据。</li>
+<li>每个组件都必须只有一个根元素，所有内容可以放到一个 div 内。</li>
+<li>当组件的 prop 越来越多时，可以声明一个 object，传递一个 object 类型的数组到组件。</li>
+<li>监听子组件事件，子组件可以通过调用内建的 $emit 方法并传入一个事件名来触发一个父级组件的事件。</li>
+<li>子组件调用内建的 $emit 方法时，可以传入第二个参数，父组件使用 $event 变量名来获取子组件传递的值，这个事件处理函数是一个方法，那么这个值将会作为第一个参数传入这个方法。</li>
+<li><a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components.html#%E5%9C%A8%E7%BB%84%E4%BB%B6%E4%B8%8A%E4%BD%BF%E7%94%A8-v-model">在组件上使用 v-model</a>。</li>
+<li>如果需要向一个组件传递内容，可以在子组件里使用插槽 slot。</li>
+<li>如果需要在不同组件之间进行动态切换，可以使用动态组件，<a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components.html#%E5%8A%A8%E6%80%81%E7%BB%84%E4%BB%B6">动态组件</a>。</li>
+<li><a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components.html#%E8%A7%A3%E6%9E%90-DOM-%E6%A8%A1%E6%9D%BF%E6%97%B6%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9">解析 DOM 模板时的注意事项</a>。</li>
+</ol>
+<h1 id="组件"><a href="#组件" class="headerlink" title="组件"></a>组件</h1><ol>
+<li>直接在 DOM 中使用时，自定义组件名字母全小写且必须包含一个连字符，避免和当前以及未来的 HTML 元素冲突。</li>
+<li>全局注册，在组件注册之后，可以用在任何新创建的 Vue 根实例（new Vue）的模板中，在所有的子组件内也都可以相互使用。</li>
+<li>全局注册，意味着即使已经不用某个组件了，该组件依然被包含在最终的构建结果中，这就造成了用户下载 JS 的无谓增加，所以尽量选择按需引入。</li>
+<li>局部注册，局部注册的组件在子组件中不可用，除非显式地声明，<a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-registration.html">局部注册</a>。</li>
+<li>如果通过 import 或 require 使用一个模块系统，那么可以方便的局部注册，清晰的组织组件目录结构，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-registration.html#%E6%A8%A1%E5%9D%97%E7%B3%BB%E7%BB%9F">模块系统</a>。</li>
+<li>对于一些基础组件想要使用自动化的全局注册，如果使用了 webpack，那么可以使用 require.context 注册，参见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-registration.html#%E5%9F%BA%E7%A1%80%E7%BB%84%E4%BB%B6%E7%9A%84%E8%87%AA%E5%8A%A8%E5%8C%96%E5%85%A8%E5%B1%80%E6%B3%A8%E5%86%8C">基础组件的自动化全局注册</a>。</li>
+<li>全局注册的行为必须在根 Vue 实例（new Vue）创建之前发生。</li>
+<li>Prop 的大小写，在 DOM 中使用组件时，camelCase（驼峰命名法）的 prop 名需要使用其等价的 kebab-case（短横线分隔命名）。</li>
+<li>Prop 类型，如果希望每个 prop 都有指定类型，那么可以用对象形式列出 prop，key 对应属性名，value 对应属性类型，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-props.html#Prop-%E7%B1%BB%E5%9E%8B">Prop 类型</a>。</li>
+<li>如果需要传入一个对象的所有属性到组件，可以简写成 v-bind=”post”，不必一个个 bind 属性。</li>
+<li>单向数据流，所有的 prop 都使得其父子 prop 之间形成了一个单向下行绑定，即父级 prop 的更新会向下流动到子组件，但是反过来不行。这样会防止从子组件意外变更父级组件的状态，从而导致你的应用的数据流向难以理解。<strong>不应该在一个子组件内部改变改变 prop</strong>。</li>
+<li><strong>注意在 JavaScript 中对象和数组是通过引用传入的</strong>，所以对于一个数组或对象类型的 prop 来说，在子组件中改变变更这个对象或数组本身将会影响到父组件的状态。</li>
+<li>Prop 验证，如果知道 prop 的属性类型，可以定义验证规则，如果一个需求没被满足，（开发环境构建版本的）Vue 将会发出警告，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-props.html#Prop-%E9%AA%8C%E8%AF%81">Prop验证</a>。</li>
+<li><strong>注意那些 prop 会在一个组件实例创建之前进行验证，所以实例的 property (如 data、computed 等) 在 default 或 validator 函数中是不可用的</strong>。</li>
+<li>替换/合并已有的 Attribute，对于绝大多数 attribute 来说，从外部提供给组件的值会替换掉组件内部设置好的值。所以如果传入 type=”text” 就会替换掉 type=”date” 并把它破坏！庆幸的是，class 和 style attribute 会稍微智能一些，即两边的值会被合并起来，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-props.html#%E6%9B%BF%E6%8D%A2-%E5%90%88%E5%B9%B6%E5%B7%B2%E6%9C%89%E7%9A%84-Attribute">替换-合并已有的-Attribute</a>。</li>
+<li>禁用 Attribute 继承，如果不希望组件的根元素继承 attribute，可以在组件的选项中设置 inheritAttrs: false，同时配合 $attrs 就可以决定哪些 attribute 继承，哪些不继承，inheritAttrs: false 选项不会影响 style 和 class 的绑定，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-props.html#%E7%A6%81%E7%94%A8-Attribute-%E7%BB%A7%E6%89%BF">禁用-Attribute-继承</a>。</li>
+<li>事件名没有命名方式的自动转换，只会自动转换为全小写，所以推荐<strong>始终使用短线分隔的事件命名方式</strong>。</li>
+<li>自定义组件的 v-model，使用 model 选项来避免冲突，详见: <a target="_blank" rel="noopener" href="https://vuejs.bootcss.com/guide/components-custom-events.html#%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BB%84%E4%BB%B6%E7%9A%84-v-model">自定义组件的 v-model</a>。</li>
+<li>如果需要对一个 prop 在父子组件间进行双向绑定，推荐使用 .sync 修饰符，但需注意版本，以及某些表达式是不能使用的，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-custom-events.html#sync-%E4%BF%AE%E9%A5%B0%E7%AC%A6">.sync 修饰符</a>。</li>
+<li>如果子组件里没有 <code>&lt;slot&gt;</code> 标签，则在使用子组件的地方，子组件标签之间的内容都会被抛弃。</li>
+<li>编译作用域，父级模板的所有内容都是在父级作用域中编译的，子模板里的所有内容都是在子作用域中编译的。</li>
+<li>插槽 slot 可以提供后备（也就是默认的）内容，使用带插槽的组件但没传内容时，插槽将显示后备内容。</li>
+<li>具名插槽，对于组件，如果包含多个 slot，可以为每个 slot 起个别名，调用的时候在 template 上使用 v-slot 指令，分别插入对应的部分，注意 v-slot 只能用在 template 上，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-slots.html#%E5%85%B7%E5%90%8D%E6%8F%92%E6%A7%BD">具名插槽</a>。</li>
+<li>具名插槽可以缩写为 #header。</li>
+<li>动态组件可以使用 keep-alive。</li>
+<li>组件，处理边界情况，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-edge-cases.html">处理边界情况</a>。</li>
+<li>父组件里直接访问一个子组件，可以使用 ref，详见: <a target="_blank" rel="noopener" href="https://cn.vuejs.org/v2/guide/components-edge-cases.html#%E8%AE%BF%E9%97%AE%E5%AD%90%E7%BB%84%E4%BB%B6%E5%AE%9E%E4%BE%8B%E6%88%96%E5%AD%90%E5%85%83%E7%B4%A0">访问子组件或子元素</a>。</li>
+</ol>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2020/08/12/JavaScript%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2020/10/06/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BF%9B%E9%98%B6%E7%AF%87/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="Vue.js 学习笔记之基础篇"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
