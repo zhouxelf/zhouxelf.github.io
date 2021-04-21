@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>理解同步、异步、阻塞、非阻塞 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="操作系统," />
+  
+
+  <meta name="description" content="IO 操作概念IO 分成两个阶段：  数据准备 内核空间复制数据到用户空间(用户进程缓冲区)   tips: 一旦拿到了数据就变成了数据操作，不再是 IO。  阻塞 IO 和非阻塞 IO 的区别在于第 1 阶段发起 IO 请求是否被阻塞，如果阻塞直到请求完成就是传统的阻塞 IO，如果不阻塞就是非阻塞 IO。 同步 IO 和异步 IO 的区别在于第 2 阶段是否被阻塞，如果不阻塞，而是操作系统做完">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解同步、异步、阻塞、非阻塞">
+<meta property="og:url" content="https://zhouxelf.com/2020/09/12/%E7%90%86%E8%A7%A3%E5%90%8C%E6%AD%A5%E3%80%81%E5%BC%82%E6%AD%A5%E3%80%81%E9%98%BB%E5%A1%9E%E3%80%81%E9%9D%9E%E9%98%BB%E5%A1%9E/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="IO 操作概念IO 分成两个阶段：  数据准备 内核空间复制数据到用户空间(用户进程缓冲区)   tips: 一旦拿到了数据就变成了数据操作，不再是 IO。  阻塞 IO 和非阻塞 IO 的区别在于第 1 阶段发起 IO 请求是否被阻塞，如果阻塞直到请求完成就是传统的阻塞 IO，如果不阻塞就是非阻塞 IO。 同步 IO 和异步 IO 的区别在于第 2 阶段是否被阻塞，如果不阻塞，而是操作系统做完">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/IO%E6%A8%A1%E5%9E%8B.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%BC%82%E6%AD%A5IO.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E9%98%BB%E5%A1%9E.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E9%9D%9E%E9%98%BB%E5%A1%9E.png">
+<meta property="og:image" content="https://zhouxelf.com/images/IO%E5%A4%8D%E7%94%A8.jpg">
+<meta property="article:published_time" content="2020-09-12T13:16:23.000Z">
+<meta property="article:modified_time" content="2021-04-20T11:21:55.043Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="操作系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/IO%E6%A8%A1%E5%9E%8B.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#IO-%E6%93%8D%E4%BD%9C"><span class="toc-text">IO 操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5"><span class="toc-text">概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%94%E7%A7%8D-IO-%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-text">五种 IO 模型的比较</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E5%BC%82%E6%AD%A5-IO%E3%80%81%E9%98%BB%E5%A1%9E%E9%9D%9E%E9%98%BB%E5%A1%9E-IO"><span class="toc-text">同步异步 IO、阻塞非阻塞 IO</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5-1"><span class="toc-text">概念</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BC%82%E6%AD%A5-IO-%E6%A8%A1%E5%9E%8B"><span class="toc-text">异步 IO 模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%BB%E5%A1%9E-IO-%E6%A8%A1%E5%9E%8B"><span class="toc-text">阻塞 IO 模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%9E%E9%98%BB%E5%A1%9E-IO-%E6%A8%A1%E5%9E%8B"><span class="toc-text">非阻塞 IO 模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IO-%E5%A4%8D%E7%94%A8%E6%A8%A1%E5%9E%8B"><span class="toc-text">IO 复用模型</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-理解同步、异步、阻塞、非阻塞" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">理解同步、异步、阻塞、非阻塞</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.09.12</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="IO-操作"><a href="#IO-操作" class="headerlink" title="IO 操作"></a>IO 操作</h1><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>IO 分成两个阶段：</p>
+<ol>
+<li>数据准备</li>
+<li>内核空间复制数据到用户空间(用户进程缓冲区)</li>
+</ol>
+<blockquote>
+<p>tips: 一旦拿到了数据就变成了数据操作，不再是 IO。</p>
+</blockquote>
+<p>阻塞 IO 和非阻塞 IO 的区别在于第 1 阶段发起 IO 请求是否被阻塞，如果阻塞直到请求完成就是传统的阻塞 IO，如果不阻塞就是非阻塞 IO。</p>
+<p>同步 IO 和异步 IO 的区别在于第 2 阶段是否被阻塞，如果不阻塞，而是操作系统做完 IO 操作再将结果返回，那么就是异步 IO。</p>
+<p>一般来讲：</p>
+<p>阻塞 IO 模型、非阻塞 IO 模型、IO 复用模型(select/poll/epoll)、信号驱动 IO 模型都属于同步 IO，因为阶段 2 都是阻塞的(尽管时间很短)。</p>
+<h3 id="五种-IO-模型的比较"><a href="#五种-IO-模型的比较" class="headerlink" title="五种 IO 模型的比较"></a>五种 IO 模型的比较</h3><p><img src="/images/IO%E6%A8%A1%E5%9E%8B.png"></p>
+<h1 id="同步异步-IO、阻塞非阻塞-IO"><a href="#同步异步-IO、阻塞非阻塞-IO" class="headerlink" title="同步异步 IO、阻塞非阻塞 IO"></a>同步异步 IO、阻塞非阻塞 IO</h1><h3 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h3><p>同步异步 IO 的概念</p>
+<ul>
+<li>同步 IO：用户进程发起 IO 请求后，需要等待或轮询内核 IO 操作完成后才能继续执行。</li>
+<li>异步 IO：用户进程发起 IO 请求后，不需要等待或轮询内核 IO 操作是否完成，内核 IO 操作完成后会通知用户进程，或调用用户进程注册的回调函数。</li>
+</ul>
+<p>阻塞非阻塞 IO 的概念</p>
+<ul>
+<li>阻塞 IO：IO 操作需要彻底完成后，才能返回用户空间。</li>
+<li>非阻塞 IO：IO 操作被调用后立即返回一个状态值，无需登台 IO 操作彻底完成。</li>
+</ul>
+<h3 id="异步-IO-模型"><a href="#异步-IO-模型" class="headerlink" title="异步 IO 模型"></a>异步 IO 模型</h3><p><img src="/images/%E5%BC%82%E6%AD%A5IO.png"></p>
+<h3 id="阻塞-IO-模型"><a href="#阻塞-IO-模型" class="headerlink" title="阻塞 IO 模型"></a>阻塞 IO 模型</h3><p><img src="/images/%E9%98%BB%E5%A1%9E.png"></p>
+<h3 id="非阻塞-IO-模型"><a href="#非阻塞-IO-模型" class="headerlink" title="非阻塞 IO 模型"></a>非阻塞 IO 模型</h3><p><img src="/images/%E9%9D%9E%E9%98%BB%E5%A1%9E.png"></p>
+<h3 id="IO-复用模型"><a href="#IO-复用模型" class="headerlink" title="IO 复用模型"></a>IO 复用模型</h3><p><img src="/images/IO%E5%A4%8D%E7%94%A8.jpg"></p>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2020/07/11/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2020/09/25/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E8%BF%9B%E9%98%B6%E7%AF%87/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="理解同步、异步、阻塞、非阻塞"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

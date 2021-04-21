@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>SpringMVC 框架及常用注解介绍 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Java,SpringMVC," />
+  
+
+  <meta name="description" content="SpringMVC 概述SpringMVC 是一个 Java Web 开发框架，也是 Spring 框架中重要的模块之一，使用它能进行快速的 Web 端应用开发。SpringMVC 默认使用单例开发，并且建议使用单例开发。相对于 Struts2 基于类的开发，SpringMVC 是基于方法开发的，它将客户端的 URL 请求映射到服务端的 Controller 内的方法，映射成功后 SpringMV">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringMVC 框架及常用注解介绍">
+<meta property="og:url" content="https://zhouxelf.com/2020/12/12/SpringMVC%20%E6%A1%86%E6%9E%B6%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="SpringMVC 概述SpringMVC 是一个 Java Web 开发框架，也是 Spring 框架中重要的模块之一，使用它能进行快速的 Web 端应用开发。SpringMVC 默认使用单例开发，并且建议使用单例开发。相对于 Struts2 基于类的开发，SpringMVC 是基于方法开发的，它将客户端的 URL 请求映射到服务端的 Controller 内的方法，映射成功后 SpringMV">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/SpringMVC%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+<meta property="og:image" content="https://zhouxelf.com/images/SpringMVC%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="https://zhouxelf.com/images/SpringMVC%E6%A0%B8%E5%BF%83Servlet%E7%BB%93%E6%9E%84%E5%9B%BE.png">
+<meta property="og:image" content="https://zhouxelf.com/images/SpringMVC%E6%A0%B8%E5%BF%83%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="https://zhouxelf.com/images/SpringMVC%E8%BF%87%E6%BB%A4%E5%99%A8%E6%8B%A6%E6%88%AA%E5%99%A8.png">
+<meta property="article:published_time" content="2020-12-12T13:16:23.000Z">
+<meta property="article:modified_time" content="2021-04-21T13:46:21.588Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="SpringMVC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/SpringMVC%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC-%E6%A6%82%E8%BF%B0"><span class="toc-text">SpringMVC 概述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC-%E7%A4%BA%E4%BE%8B"><span class="toc-text">SpringMVC 示例</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC-%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-text">SpringMVC 请求处理流程图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC-%E6%A0%B8%E5%BF%83-Servlet-%E7%BB%93%E6%9E%84%E5%9B%BE"><span class="toc-text">SpringMVC 核心 Servlet 结构图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#doDispatcher-%E6%96%B9%E6%B3%95%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="toc-text">doDispatcher 方法处理流程图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC-%E4%B8%AD%E8%BF%87%E6%BB%A4%E5%99%A8%E3%80%81%E6%8B%A6%E6%88%AA%E5%99%A8%E3%80%81%E7%9B%91%E5%90%AC%E5%99%A8"><span class="toc-text">SpringMVC 中过滤器、拦截器、监听器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="toc-text">过滤器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="toc-text">拦截器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%9B%91%E5%90%AC%E5%99%A8"><span class="toc-text">监听器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpringMVC-%E6%B3%A8%E8%A7%A3"><span class="toc-text">SpringMVC 注解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E5%9C%A8-SpringMVC-%E4%B8%AD%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="toc-text">注解在 SpringMVC 中的作用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-text">注解的类型</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E6%B3%A8%E8%A7%A3"><span class="toc-text">常用的注解</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Spring-%E4%BD%BF%E7%94%A8%E6%97%B6%E7%9A%84%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="toc-text">Spring 使用时的注意点</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-SpringMVC 框架及常用注解" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">SpringMVC 框架及常用注解介绍</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.12.12</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="SpringMVC-概述"><a href="#SpringMVC-概述" class="headerlink" title="SpringMVC 概述"></a>SpringMVC 概述</h1><p>SpringMVC 是一个 Java Web 开发框架，也是 Spring 框架中重要的模块之一，使用它能进行快速的 Web 端应用开发。SpringMVC 默认使用单例开发，并且建议使用单例开发。相对于 Struts2 基于类的开发，SpringMVC 是基于方法开发的，它将客户端的 URL 请求映射到服务端的 Controller 内的方法，映射成功后 SpringMVC 生成一个 Handler 对象，对象中只包括了一个 Method 方法，方法执行结束后形参数据销毁。</p>
+<h1 id="SpringMVC-示例"><a href="#SpringMVC-示例" class="headerlink" title="SpringMVC 示例"></a>SpringMVC 示例</h1><p><strong>1&gt;</strong> 使用 Maven 创建一个 Web 项目，然后在 pom.xml 文件中添加以下依赖</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- SpringMVC 需要的包，会自动加载依赖的包 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-webmvc<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>4.1.5.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>javax.servlet<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>javax.servlet-api<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">scope</span>&gt;</span>provided<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2&gt;</strong> 在 web.xml 文件中配置 DispatcherServlet、过滤器、监听器等<br><strong>3&gt;</strong> 在 web.xml 文件中指定的 contextConfig 文件 spring-servlet.xml 中对拦截器、视图解析器、注解等进行配置<br><strong>4&gt;</strong> 目录结构</p>
+<p><img src="/images/SpringMVC%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84.png"></p>
+<ul>
+<li>controller 包下是控制器类</li>
+<li>service 包下是服务类</li>
+<li>bean 包下是数据类</li>
+<li>jsp 目录下是 .jsp 视图文件</li>
+</ul>
+<h1 id="SpringMVC-请求处理流程图"><a href="#SpringMVC-请求处理流程图" class="headerlink" title="SpringMVC 请求处理流程图"></a>SpringMVC 请求处理流程图</h1><p><img src="/images/SpringMVC%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B%E5%9B%BE.png"></p>
+<p>SpringMVC 是一个基于 DispatcherServlet 的 MVC 框架，主要由 DispatcherServlet、HandlerMapping、Controller、ViewResolver 和 View 组成。</p>
+<p>一个 HTTP 请求处理过程如下：</p>
+<ol>
+<li>DispatcherServlet 接收到请求后，根据对应配置文件中配置的处理器映射，找到对应的处理器映射项(HandlerMapping)，根据配置的映射规则，找到对应的处理器(Handler)；</li>
+<li>调用相应处理器中的处理方法，处理该请求，处理器处理结束后会将一个 ModelAndView 类型的数据传给 DispatcherServlet，这其中包含了处理结果的视图和视图中要使用的数据；</li>
+<li>DispatcherServlet 根据得到的 ModelAndView 中的视图对象，找到一个合适的视图解析器(ViewResolver)，根据视图解析器的配置将视图要显示的数据传给对应的视图，最后给浏览器构造一个 HTTP 响应。</li>
+</ol>
+<blockquote>
+<p>tips:</p>
+<ol>
+<li>Handler 处理以后再返回相应的视图(View)和模型(Model)，返回的视图和模型都可以不指定，即可以只返回 View 或 Model，或都不返回。</li>
+<li>Handler 处理后会委派给一个视图，由该视图来处理方法的返回值。处理程序的返回值并不代表视图的具体实现，可以只是 String 类型，代表视图名，甚至是 void(此时 SpringMVC 可以根据方法名或者控制器名找默认视图)。</li>
+<li>当返回值是视图名称时，视图可以拿到方法参数，比如处理方法以 Map 为参数，则这个 Map 对于视图是可见的。</li>
+</ol>
+</blockquote>
+<h1 id="SpringMVC-核心-Servlet-结构图"><a href="#SpringMVC-核心-Servlet-结构图" class="headerlink" title="SpringMVC 核心 Servlet 结构图"></a>SpringMVC 核心 Servlet 结构图</h1><p><img src="/images/SpringMVC%E6%A0%B8%E5%BF%83Servlet%E7%BB%93%E6%9E%84%E5%9B%BE.png"></p>
+<p>在 SpringMVC 中 Servlet 可分为三个层次：</p>
+<ol>
+<li>HttpServletBean，其直接继承自 HttpServlet，主要是将 Servlet 中配置的参数设置到相应的属性中；</li>
+<li>FrameworkServlet，其负责初始化 WebApplicationContext；</li>
+<li>Dispatcherservlet，其负责初始化自身的 9 个组件。</li>
+</ol>
+<h1 id="doDispatcher-方法处理流程图"><a href="#doDispatcher-方法处理流程图" class="headerlink" title="doDispatcher 方法处理流程图"></a>doDispatcher 方法处理流程图</h1><p>doDispatcher 是 SpringMVC 中最核心的处理方法，负责处理请求和渲染页面。其最核心的代码只有 4 句，但却是精华中的精华，分别对应 4 个任务：</p>
+<ol>
+<li>根据 request 找到 Handler；</li>
+<li>根据 Handler 找到对应的 HandlerAdapter；</li>
+<li>用 HandlerAdapter 处理 Handler；</li>
+<li>调用 processDispatcherResult 方法处理结果。</li>
+</ol>
+<p>其详细的处理过程如下图</p>
+<p><img src="/images/SpringMVC%E6%A0%B8%E5%BF%83%E5%A4%84%E7%90%86%E6%96%B9%E6%B3%95%E6%B5%81%E7%A8%8B%E5%9B%BE.png"></p>
+<h1 id="SpringMVC-中过滤器、拦截器、监听器"><a href="#SpringMVC-中过滤器、拦截器、监听器" class="headerlink" title="SpringMVC 中过滤器、拦截器、监听器"></a>SpringMVC 中过滤器、拦截器、监听器</h1><h3 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h3><p>过滤器(Filter)依赖于 Servlet 容器，在容器初始化时调用，做一些过滤操作或获取想要获取的数据，比如：在过滤器中修改字符编码；在过滤器中修改 HttpServletRequest 的一些参数；过滤掉一些低俗文字、危险字符等。</p>
+<p>一个 Filter 包括：</p>
+<ol>
+<li>在 servlet 被调用之前截获；</li>
+<li>在 servlet 被调用之前检查 servlet sequest；</li>
+<li>根据需要修改 request header 和 request body；</li>
+<li>根据需要修改 response header 和 response body；</li>
+<li>在 servlet 被调用之后截获。</li>
+</ol>
+<p>每一个 Filter 从 doFilter() 方法中得到当前的 request 及 response，在这个方法里可以进行任何针对 request 及 response 的操作，Filter 调用 chain.doFilter() 方法把控制权交给下一个 Filter。</p>
+<h3 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h3><p>拦截器依赖于 Web 框架，在 SpringMVC 中就是依赖于 SpringMVC 框架。拦截器的实现是基于 Java 的反射机制，属于面向切面编程的一种运用。同时一个拦截器实例在一个 Controller 生命周期之内可以多次调用，但是缺点是只能对 Controller 请求进行拦截，对其它的一些比如直接访问静态资源的请求则没办法进行拦截处理。</p>
+<h3 id="监听器"><a href="#监听器" class="headerlink" title="监听器"></a>监听器</h3><p>监听器可以监听客户端的请求、服务端的操作等等，通过监听器，可以自动激发一些操作，比如监听在线用户的数量。监听器采用观察者模式，能够方便的从另一个纵向维度控制程序和数据。目前 Servlet 中提供了 6 种两类事件的观察者接口，分别是：</p>
+<ol>
+<li>3 个 EventListeners 类型的 ServletContextAttributeListener、ServletRequestAttributeListener、HttpSessionAttributeListener；</li>
+<li>3 个 LifecycleListeners 类型的 ServletContextListener、HttpSessionListener、ServletRequestListener。</li>
+</ol>
+<p>过滤器、拦截器的执行顺序如下图</p>
+<p><img src="/images/SpringMVC%E8%BF%87%E6%BB%A4%E5%99%A8%E6%8B%A6%E6%88%AA%E5%99%A8.png"></p>
+<h1 id="SpringMVC-注解"><a href="#SpringMVC-注解" class="headerlink" title="SpringMVC 注解"></a>SpringMVC 注解</h1><p>SpringMVC 中 annotation 的大量使用提高了开发效率，在结构上也比 xml 清晰，也更加的便于维护，不论是注入还是 AOP 还是事务，annotation 都远远的比 xml 好用。</p>
+<h3 id="注解在-SpringMVC-中的作用"><a href="#注解在-SpringMVC-中的作用" class="headerlink" title="注解在 SpringMVC 中的作用"></a>注解在 SpringMVC 中的作用</h3><p>注解也叫元数据，是 JDK1.5 版本开始引入的一个特性，用于对代码进行说明，可以对包、类、接口、字段、方法参数、局部变量等进行注解，它主要的作用有以下四个方面：</p>
+<ol>
+<li>生成文档，通过代码里标识的元数据生成 javadoc 文档；</li>
+<li>编译检查，通过代码里标识的元数据让编译器在编译期间进行检查验证；</li>
+<li>编译时动态处理，编译时通过代码里标识的元数据动态处理，例如动态生成代码；</li>
+<li>运行时动态处理，运行时通过代码里标识的元数据动态处理，例如使用反射注入实例。</li>
+</ol>
+<h3 id="注解的类型"><a href="#注解的类型" class="headerlink" title="注解的类型"></a>注解的类型</h3><p>注解一般分为以下三类：</p>
+<ol>
+<li>Java 自带的标准注解，如 @Override、@Deprecated、@SuppressWarnings，分别用于标明重写某个方法、标明某个类或方法过时、标明要忽略的警告，用这些注解标明后编译器就会进行检查；</li>
+<li>元注解，元注解是用于定义注解的注解，如 @Retention、@Target、@Inherited、@Documented；</li>
+<li>自定义注解，可以根据自己的需求定义注解，并可用元注解对自定义注解进行注解。 </li>
+</ol>
+<p><strong>元注解说明</strong></p>
+<p>@Target 用于描述注解的使用范围</p>
+<table>
+<thead>
+<tr>
+<th>ElementType 取值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CONSTRUCTOR</td>
+<td>用于描述构造器</td>
+</tr>
+<tr>
+<td>FIELD</td>
+<td>用于描述域即类成员变量</td>
+</tr>
+<tr>
+<td>LOCAL_VARIABLE</td>
+<td>用于描述局部变量</td>
+</tr>
+<tr>
+<td>METHOD</td>
+<td>用于描述方法</td>
+</tr>
+<tr>
+<td>PACKAGE</td>
+<td>用于描述包</td>
+</tr>
+<tr>
+<td>PARAMETER</td>
+<td>用于描述参数</td>
+</tr>
+<tr>
+<td>TYPE</td>
+<td>用于描述类、接口(包括注解类型)或 enum 声明</td>
+</tr>
+</tbody></table>
+<p>@Retention 用于描述注解的生命周期</p>
+<table>
+<thead>
+<tr>
+<th>RetentionPoicy 取值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SOURCE</td>
+<td>在源文件中有效(即源文件保留)</td>
+</tr>
+<tr>
+<td>CLASS</td>
+<td>在 class 文件中有效(即 class 保留)</td>
+</tr>
+<tr>
+<td>RUNTIME</td>
+<td>在运行时有效(即运行时保留)</td>
+</tr>
+</tbody></table>
+<p>@Documented 用于描述其它类型的 annotation 应该被作为被标注的程序成员的公共 API，因此可以被例如 javadoc 此类的工具文档化，Documented 是一个标记注解，没有成员。</p>
+<p>@Inherited 一个标记注解，@Inherited 阐述了某个被标注的类型是被继承的。</p>
+<h1 id="常用的注解"><a href="#常用的注解" class="headerlink" title="常用的注解"></a>常用的注解</h1><ul>
+<li>@Service 用于标注业务层组件</li>
+<li>@Controller 用于标注控制层组件</li>
+<li>@Repository 用于标注数据访问组件</li>
+<li>@Component 泛指组件，当组件不好归类的时候，可以使用这个注解</li>
+<li>@RequestMapping 为控制器指定可以处理哪些 URL 请求</li>
+<li>@RequestParam 在处理方法入参处使用该注解可以把请求参数传递给请求方法</li>
+<li>@PathVariable 绑定 URL 占位符到入参</li>
+<li>@ExceptionHandler 注解到方法上，出现异常时会执行该方法</li>
+<li>@RequestBody 该注解用于读取 Request 请求的 Body 部分数据，使用系统默认配置的HttpMessageConverter 进行解析，然后把相应的数据绑定到要返回的对象上，再把HttpMessageConverter 返回的对象数据绑定到 Controller 中方法的参数上</li>
+<li>@ResponseBody 该注解用于将 Controller 方法返回的对象，通过适当的HttpMessageConverter 转换为指定格式后，写入到 Response 对象的 Body 数据区</li>
+</ul>
+<h1 id="Spring-使用时的注意点"><a href="#Spring-使用时的注意点" class="headerlink" title="Spring 使用时的注意点"></a>Spring 使用时的注意点</h1><ol>
+<li>不要在 Controller 中定义成员变量 </li>
+<li>如果必须要在 Controller 中定义一个非静态成员变量时，最好通过注解 @Scope(“prototype”) 将其设置为多例模式</li>
+</ol>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2020/11/12/JavaScript%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="hide pull-right" href="/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="SpringMVC 框架及常用注解介绍"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
