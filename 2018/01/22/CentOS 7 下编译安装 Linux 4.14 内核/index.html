@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>CentOS 7 下编译安装 Linux 4.14 内核 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="环境搭建,Linux," />
+  
+
+  <meta name="description" content="编译之前引入最近在学习 Linux，看到介绍内核，就想着自己编译一下内核，虽然不会搞硬件开发，不会写底层的东西，但还是想看一下编译的整个过程。想着就开始弄，没想到中间还是有很多坑的，尤其是编译之前，选择配置这一部分，配置项太多了，因为只是想看编译的整个过程，所以就没有深究每一个配置项。整个过程比较长，特此记录，避免以后再次踩坑。 环境开始之前，先介绍一下编译环境。直接在自己常用的 Linux 主机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CentOS 7 下编译安装 Linux 4.14 内核">
+<meta property="og:url" content="https://zhouxelf.com/2018/01/22/CentOS%207%20%E4%B8%8B%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85%20Linux%204.14%20%E5%86%85%E6%A0%B8/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="编译之前引入最近在学习 Linux，看到介绍内核，就想着自己编译一下内核，虽然不会搞硬件开发，不会写底层的东西，但还是想看一下编译的整个过程。想着就开始弄，没想到中间还是有很多坑的，尤其是编译之前，选择配置这一部分，配置项太多了，因为只是想看编译的整个过程，所以就没有深究每一个配置项。整个过程比较长，特此记录，避免以后再次踩坑。 环境开始之前，先介绍一下编译环境。直接在自己常用的 Linux 主机">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_1.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_2.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_3.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_4.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_5.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_6.jpg">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_7.jpg">
+<meta property="article:published_time" content="2018-01-22T11:21:44.000Z">
+<meta property="article:modified_time" content="2021-03-21T08:57:44.103Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="环境搭建">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_1.jpg">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BC%96%E8%AF%91%E4%B9%8B%E5%89%8D"><span class="toc-text">编译之前</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E5%85%A5"><span class="toc-text">引入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%8E%AF%E5%A2%83"><span class="toc-text">环境</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E5%8E%8B%E5%86%85%E6%A0%B8"><span class="toc-text">解压内核</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E9%A1%B9"><span class="toc-text">配置项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%96%E8%AF%91"><span class="toc-text">编译</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-text">安装</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E5%BC%95%E5%AF%BC"><span class="toc-text">更新引导</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-CentOS 7 下编译安装 Linux 4.14 内核" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">CentOS 7 下编译安装 Linux 4.14 内核</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2018.01.22</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="编译之前"><a href="#编译之前" class="headerlink" title="编译之前"></a>编译之前</h1><h2 id="引入"><a href="#引入" class="headerlink" title="引入"></a>引入</h2><p>最近在学习 Linux，看到介绍内核，就想着自己编译一下内核，虽然不会搞硬件开发，不会写底层的东西，但还是想看一下编译的整个过程。想着就开始弄，没想到中间还是有很多坑的，尤其是编译之前，选择配置这一部分，配置项太多了，因为只是想看编译的整个过程，所以就没有深究每一个配置项。整个过程比较长，特此记录，避免以后再次踩坑。</p>
+<h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p>开始之前，先介绍一下编译环境。直接在自己常用的 Linux 主机上编译，中间肯定会出现问题，最后可能导致系统崩溃，别不信，我已经吃过几次亏了，所以这次选择在虚拟机软件 VMware Workstation 上安装 Linux 虚拟机进行编译安装。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">虚拟机软件：VMware Workstation 14           </span><br><span class="line">Liunx 发行版：CentOS 7 内置内核 linux 3.10.0</span><br><span class="line">待编译内核：linux 4.14.14</span><br></pre></td></tr></table></figure>
+
+<p>开始编译之前，先把几项准备工作完成。</p>
+<ol>
+<li><p>去 Linux 内核官网 <a target="_blank" rel="noopener" href="https://www.kernel.org/">www.kernel.org</a> 下载 Linux 内核文件，选择稳定版（stable），文件名为 linux-4.14.14.tar.xz，去 CentOS 官网 <a target="_blank" rel="noopener" href="https://www.centos.org/">www.centos.org</a> 下载最新的 CentOS 7。</p>
+</li>
+<li><p>把 CentOS 在 VMware 里装好，安装过程不在赘述，网上一大堆。这里提醒一句，分给 CentOS 的硬盘空间不要太小，不然内核编译之后，空间可能不够。我第一次编译时，就是因为分的太小了，**/** 目录装完系统之后只剩 6G 多，编译一个多小时，提示空间不足，编译失败，最后不得不重装系统，又耽误了时间。</p>
+</li>
+<li><p>此外，做好宿主机和虚拟机之间文件夹的共享，保证虚拟机可以读取宿主机里下载好的 Linux 内核文件，挂载可以实现，这个不会可以搜一下。</p>
+</li>
+</ol>
+<p>准备工作完成，下面正式开始编译内核，请做好踩坑的准备。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>开始之前呢，还要啰嗦几句，我先把安装的大致过程说一下，避免做到某一步时，只是在重复，却不知道在做什么。</p>
+<p>编译安装大致分为以下几步：</p>
+<ol>
+<li>解压内核</li>
+<li>编译前，选择配置项，生成 config 文件</li>
+<li>编译内核</li>
+<li>安装模块，安装内核</li>
+<li>更新引导文件</li>
+</ol>
+<h2 id="解压内核"><a href="#解压内核" class="headerlink" title="解压内核"></a>解压内核</h2><p>先把内核文件放在上面提到的宿主机和虚拟机之间的共享文件夹，我的宿主机共享文件夹是 share，挂载到了 CentOS 的 /mnt/hgfs/share/ 目录下。</p>
+<p>切换到 root 权限，将内核文件解压到指定目录，这个目录是没有限定的，哪个都行，这里放到了 /usr/src/ 目录下，这个也是 CentOS 内核所在的目录，后缀 .tar.xz 的文件可以使用下面的命令解压。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar xvJf linux-4.14.14.tar.xz -C &#x2F;usr&#x2F;src&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_1.jpg"></p>
+<p>内核解压之后，每个文件夹内包含的是什么代码，可以自行搜索了解一下。</p>
+<h2 id="配置项"><a href="#配置项" class="headerlink" title="配置项"></a>配置项</h2><p>重点来了，解压之后，编译之前要先生成 config 配置文件。这个文件是干什么的呢？它是编译时的必备文件，指明了所有的配置项，编译时就是根据你选择的配置项来定制内核的。在你的 CentOS 内同样有这样一个配置文件，在 /boot/ 目录下有一个 config 开头的文件，就是它，你可以先 cat 一下，会发现都是键值对，所有的配置项都在这。</p>
+<p>配置项非常多，可以随心所欲的定制内核，把不需要的全部关闭，当然也不是随心所欲，某些配置项是必须要选的，否则可能连系统也启动不了。</p>
+<p>选择配置项的方式有以下几种，当然它们的目的都是为了生成 config 文件，所以选择哪种都可以。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">make config （基于文本的配置界面）</span><br><span class="line">make menuconfig （基于文本菜单的配置界面）</span><br><span class="line">make xconfig （基于图形窗口的配置界面）</span><br><span class="line">make oldconfig （基于原来内核配置的基础上修改）</span><br></pre></td></tr></table></figure>
+
+<p>以上几种，make xconfig 最为友好，基于窗口操作，但是需要 Xwindow 的支持，CentOS 还好，若是使用其它没有图形界面的发行版就 GG 了。make menuconfig 相对比较友好，又是基于文本菜单，所有的发行版都可以使用，所以这里推荐使用 make menuconfig。</p>
+<p>使用 make menuconfig 需要 ncurses-devel 的支持，如果之前没装过，需要执行下面的命令安装一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install ncurses-devel</span><br></pre></td></tr></table></figure>
+
+<p>执行 make menuconfig，开始选择配置项</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_2.jpg"></p>
+<p>如果执行没有错误的话，会出现下面这个页面</p>
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_3.jpg"></p>
+<p>Linux 内核所有的配置项都在这里，我第一次看到时，我去，这也太多了吧，这什么时候能看完。</p>
+<p>为了选择配置项，又开始搜配置项的意思，看了几个比较大的之后，比如基本配置、网络、文件系统等等，就没再看了。我开始是为了看整个编译过程，研究每一配置项，没有太大的意义，并且不同的 CPU 架构，所能配置的配置项也是不一样的。网上有人解释了每个配置项的意义，可能不是最新的内核，感兴趣的可以研究一下 <a target="_blank" rel="noopener" href="http://www.jinbuguo.com/kernel/longterm-linux-kernel-options.html">Linux 内核配置选项简介-金步国</a></p>
+<p>内核的编译分为两个部分，核心和模块，对于核心的部分，要编译进核心，可能以后会用到的部分，尽量编译成模块。</p>
+<p>文本菜单选择界面，使用左（←）、右（→）箭头切换底部菜单，上（↑）、下（↓）箭头切换中间的配置项，<strong>空格键</strong> 选择配置项，部分配置项右边有 <strong>—&gt;</strong> 标识，代表有下级子项，可以使用 <strong>Enter</strong> 进去选择。</p>
+<p>同时每一项的前面都有以下标识，可以根据需要选择。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;*&gt;[*]  表示编译进核心</span><br><span class="line">&lt;M&gt;     表示编译成模块</span><br><span class="line">空格    表示不选中此项</span><br></pre></td></tr></table></figure>
+
+<p>当然，如果你只是看一下整个编译过程，不想深究每一项，执行上一步 make menuconfig 之后，直接保存退出就可以了，它会使用 CentOS 内部的配置文件作为这次编译的配置文件，不知道 CentOS 内部配置文件在哪的，自己往前翻。</p>
+<p>保存退出之后的效果如下图</p>
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_4.jpg"></p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>配置项选完，config 配置文件生成之后，就可以开始编译了，编译需要 elfutils-libelf-devel 的支持，先执行下面的命令安装一下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install elfutils-libelf-devel</span><br></pre></td></tr></table></figure>
+
+<p>内核的编译，执行 make 即可开始编译。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make</span><br></pre></td></tr></table></figure>
+
+<p>若编译过程中提示 <em>致命错误：openssl/opensslv.h：没有那个文件或目录</em> ，请执行下面的命令安装一下依赖。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install openssl-devel</span><br></pre></td></tr></table></figure>
+
+<p>编译时间比较长，如果上面你是自定义配置项，把不需要的配置都关闭，编译会快的多。我这使用的 CentOS 内部的配置文件，CentOS 为了大多数人的使用，开的配置项比较多，所以编译的时间比较长，当然，也和你的电脑配置有关。我记了一下时间，这一部分的编译用了两个半小时，所以请耐心等待，可以去喝个咖啡。</p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>经过了漫长的等待，终于编译完成，现在可以开始安装了。上面配置项有的编译进核心，有的编译成模块，所以安装也分为两个部分，模块安装和核心安装。</p>
+<p>执行 make modules_install 开始安装模块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make modules_install</span><br></pre></td></tr></table></figure>
+
+<p>等待完成，执行 make install 开始安装核心</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<p>执行完成之后，就可以在 /boot/ 目录下看到新编译的内核了。</p>
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_5.jpg"></p>
+<h2 id="更新引导"><a href="#更新引导" class="headerlink" title="更新引导"></a>更新引导</h2><p>到现在为止，离成功就差一步更新引导了。可以直接去修改 /boot/grub2/grub.cfg 文件来更新引导，但是非常不建议这样去做。</p>
+<p>推荐使用 grub2-mkconfig 来更新引导文件，下面的命令会根据 /boot/ 目录下的内核文件自动更新 grub 文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grub2-mkconfig -o &#x2F;boot&#x2F;grub2&#x2F;grub.cfg</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_6.jpg"></p>
+<p>执行完之后，下次启动系统的时候就可以选择我们编译的内核了。如果想修改默认的启动内核，可以通过修改 /etc/default/grub 文件来实现。</p>
+<p>重启系统，如果看到两个内核，说明已经成功了，你可以自由的选择哪个内核。</p>
+<p><img src="/images/%E5%86%85%E6%A0%B8%E7%BC%96%E8%AF%91_7.jpg"></p>
+<p>至此，内核的编译安装就全部结束了，整个过程中，如果出现什么问题，根据报错信息就可以解决了。最后再啰嗦几句，说说这次编译。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>用 Linux 系统也很久了，没去研究过内核，只是知道而已，就是突然心血来潮想要编译一下 Linux 内核，就去搞了，一个简单的编译，还是遇到了不少坑。首先，第一次编译时，CentOS 分区给的太小，导致内核编译了一个多小时后停了下来，一看，好嘛，空间已经用完了。马上删了虚拟机，又重装，这次分了 50G，应该不会出现这个问题了。选择配置项的时候，又研究了一上午，一直在看每个配置项什么意思，总是想把每一项弄明白，看了一部分后，感觉工作量太大了，而且背离了初衷，然后就不看了，直接跳过去了。后面的过程就比较快，一气呵成。比较不足的还是没有定义自己的配置项，把自己编译最大的好处隔过去了，以后需要了再去搞吧，编译应该能节省不少时间。来来回回整了两天，虽然东西不太多，我感觉还是有点意义的。<br><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2018/01/20/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A1%AC%E4%BB%B6%E6%A6%82%E8%BF%B0/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2018/01/28/CentOS%207%20%E4%B8%8B%E8%A7%A3%E5%86%B3%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%8A%A5%20Redis%20server%20went%20away%20%E7%9A%84%E9%94%99%E8%AF%AF/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="CentOS 7 下编译安装 Linux 4.14 内核"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

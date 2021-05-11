@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java 线程池原理分析 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Java,线程池," />
+  
+
+  <meta name="description" content="线程池类图  Executor 接口提供一种思想：将任务提交和任务执行进行解耦。用户只需提供 Runnable 对象，将任务的运行逻辑提交到执行器(Executor)中，由 Executor 框架完成线程的调配和任务的执行部分。 ExecutorService 接口增加了一些能力：1&gt; 扩充执行任务的能力，补充可以为一个或一批异步任务生成 Future 的方法，(比如 submit 方法)；">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 线程池原理分析">
+<meta property="og:url" content="https://zhouxelf.com/2021/03/21/Java%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="线程池类图  Executor 接口提供一种思想：将任务提交和任务执行进行解耦。用户只需提供 Runnable 对象，将任务的运行逻辑提交到执行器(Executor)中，由 Executor 框架完成线程的调配和任务的执行部分。 ExecutorService 接口增加了一些能力：1&gt; 扩充执行任务的能力，补充可以为一个或一批异步任务生成 Future 的方法，(比如 submit 方法)；">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%B1%BB%E5%9B%BE.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png">
+<meta property="og:image" content="https://zhouxelf.com/images/ThreadPoolExecutor.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%8A%B6%E6%80%81.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6_2.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C_2.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C_3.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E7%94%B3%E8%AF%B7.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E7%94%B3%E8%AF%B7_2.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E4%BB%BB%E5%8A%A1%E6%8B%92%E7%BB%9D.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E7%AE%A1%E7%90%86.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C_2.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C_3.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%BF%E7%A8%8B%E5%9B%9E%E6%94%B6.png">
+<meta property="og:image" content="https://zhouxelf.com/images/%E7%BA%BF%E7%A8%8B%E5%9B%9E%E6%94%B6_2.png">
+<meta property="article:published_time" content="2021-03-21T13:15:23.000Z">
+<meta property="article:modified_time" content="2021-04-21T15:11:55.584Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="线程池">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%B1%BB%E5%9B%BE.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%B1%BB%E5%9B%BE"><span class="toc-text">线程池类图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%88%9B%E5%BB%BA%E6%96%B9%E5%BC%8F"><span class="toc-text">线程池创建方式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#ThreadPoolExecutor-%E5%88%86%E6%9E%90"><span class="toc-text">ThreadPoolExecutor 分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA-ThreadPoolExecutor"><span class="toc-text">创建 ThreadPoolExecutor</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-text">线程池生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E7%AE%A1%E7%90%86"><span class="toc-text">任务管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E7%9A%84%E8%B0%83%E5%BA%A6"><span class="toc-text">任务的调度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="toc-text">任务的执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E7%9A%84%E7%94%B3%E8%AF%B7"><span class="toc-text">任务的申请</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1%E7%9A%84%E6%8B%92%E7%BB%9D"><span class="toc-text">任务的拒绝</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Worker-%E7%BA%BF%E7%A8%8B%E7%9A%84%E7%AE%A1%E7%90%86"><span class="toc-text">Worker 线程的管理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Worker-%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C"><span class="toc-text">Worker 线程执行</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%9B%9E%E6%94%B6"><span class="toc-text">线程的回收</span></a></li></ol></li></ol></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Java 线程池原理分析" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Java 线程池原理分析</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2021.03.21</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="线程池类图"><a href="#线程池类图" class="headerlink" title="线程池类图"></a>线程池类图</h1><p><img src="/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%B1%BB%E5%9B%BE.png"></p>
+<ul>
+<li>Executor 接口提供一种思想：将任务提交和任务执行进行解耦。用户只需提供 Runnable 对象，将任务的运行逻辑提交到执行器(Executor)中，由 Executor 框架完成线程的调配和任务的执行部分。</li>
+<li>ExecutorService 接口增加了一些能力：1&gt; 扩充执行任务的能力，补充可以为一个或一批异步任务生成 Future 的方法，(比如 submit 方法)；2&gt; 提供了管控线程池的方法，比如停止线程池的运行(shutdown)。</li>
+<li>AbstractExecutorService 则是上层的抽象类，将执行任务的流程串联了起来，保证下层的实现只需关注一个执行任务的方法即可。</li>
+<li>最下层的实现类 ThreadPoolExecutor 将会一方面维护自身的生命周期，另一方面同时管理线程和任务。</li>
+</ul>
+<h1 id="线程池创建方式"><a href="#线程池创建方式" class="headerlink" title="线程池创建方式"></a>线程池创建方式</h1><ul>
+<li>Executors.newFixedThreadPool() 创建固定大小的线程池</li>
+<li>Executors.newSingleThreadExecutor() 创建单个线程的线程池</li>
+<li>Executors.newCachedThreadPool() 无限线程池</li>
+<li>Executors.newScheduledThreadPool() 创建一个定长线程池，支持定时及周期性任务执行</li>
+</ul>
+<p>以上实际调用到 ThreadPoolExecutor 类</p>
+<ul>
+<li>JDK8 Executors.newWorkStealingPool() 根据所需的并发数来动态创建和关闭线程</li>
+</ul>
+<h1 id="ThreadPoolExecutor-分析"><a href="#ThreadPoolExecutor-分析" class="headerlink" title="ThreadPoolExecutor 分析"></a>ThreadPoolExecutor 分析</h1><p>线程池运行流程图</p>
+<p><img src="/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E8%BF%90%E8%A1%8C%E6%B5%81%E7%A8%8B%E5%9B%BE.png"></p>
+<h2 id="创建-ThreadPoolExecutor"><a href="#创建-ThreadPoolExecutor" class="headerlink" title="创建 ThreadPoolExecutor"></a>创建 ThreadPoolExecutor</h2><p><img src="/images/ThreadPoolExecutor.png"></p>
+<ul>
+<li>corePoolSize 线程池的基本大小</li>
+<li>maximumPoolSize 线程池最大线程大小</li>
+<li>keepAliveTime 和 unit 则是线程空闲后的存活时间</li>
+<li>workQueue 用于存放任务的阻塞队列</li>
+<li>handler 当队列和最大线程池都满了之后的饱和策略</li>
+</ul>
+<h2 id="线程池生命周期"><a href="#线程池生命周期" class="headerlink" title="线程池生命周期"></a>线程池生命周期</h2><p>关键属性 ctl(AtomicInteger) 表示为线程池控制状态，它是一个被两个字段 workerCount(工作线程数量)、runState(线程池运行状态) 打包成的原子 Integer。</p>
+<ul>
+<li>workerCount 存储在 Integer 的后 29 位，所以 workerCount 的最大值是 2^29 - 1(大概 5 亿)，而不是 2^32 - 1(大概 20 亿)。</li>
+<li>runState 存储在 Integer 的前 3 位，有 RUNNING、SHUTDOWN、STOP、TIDYING、TERMINATED 共 5 个状态。</li>
+</ul>
+<p><img src="/images/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%8A%B6%E6%80%81.png"></p>
+<ul>
+<li>RUNNING 自然是运行状态，指可以接受任务执行队列里的任务</li>
+<li>SHUTDOWN 指调用了 shutdown() 方法，不再接受新任务了，但是队列里的任务得执行完毕</li>
+<li>STOP 指调用了 shutdownNow() 方法，不再接受新任务，同时抛弃阻塞队列里的所有任务并中断所有正在执行任务</li>
+<li>TIDYING 所有任务都执行完毕，在调用 shutdown()、shutdownNow() 时都会尝试更新为这个状态</li>
+<li>TERMINATED 终止状态，当执行 terminated() 后会更新为这个状态</li>
+</ul>
+<h2 id="任务管理"><a href="#任务管理" class="headerlink" title="任务管理"></a>任务管理</h2><p>任务管理是指，通过检查现在线程池的运行状态、运行线程数、运行策略，来决定接下来执行的流程，是直接申请线程执行，或是缓冲到队列中执行，亦或是直接拒绝该任务。</p>
+<h3 id="任务的调度"><a href="#任务的调度" class="headerlink" title="任务的调度"></a>任务的调度</h3><p><img src="/images/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6.png"></p>
+<p>一种是任务直接由新创建的线程执行，另一种是线程从任务队列中获取任务然后执行。</p>
+<p><img src="/images/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6_2.png"></p>
+<ol>
+<li>获取当前线程池的状态；</li>
+<li>当前线程数量小于 coreSize 时创建一个新的线程运行；</li>
+<li>如果当前线程处于运行状态，并且写入阻塞队列成功；</li>
+<li>双重检查，再次获取线程状态：如果线程状态变了(非运行状态)就需要从阻塞队列移除任务，并尝试判断线程是否全部执行完毕，同时执行拒绝策略；</li>
+<li>如果当前线程池为空就新创建一个线程并执行；</li>
+<li>如果在第 3 步的判断为非运行状态，尝试新建线程，如果失败则执行拒绝策略。</li>
+</ol>
+<h3 id="任务的执行"><a href="#任务的执行" class="headerlink" title="任务的执行"></a>任务的执行</h3><p><img src="/images/%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C.png"></p>
+<p>增加 worker ==&gt; new worker ==&gt; worker 的 run() ==&gt; worker 的 runWorker ==&gt; 线程的执行</p>
+<p><img src="/images/%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C_2.png"></p>
+<p>循环获取 task 进行执行，见任务的申请</p>
+<p><img src="/images/%E4%BB%BB%E5%8A%A1%E6%89%A7%E8%A1%8C_3.png"></p>
+<h3 id="任务的申请"><a href="#任务的申请" class="headerlink" title="任务的申请"></a>任务的申请</h3><p>线程从任务缓存模块中不断地取任务执行，实现线程管理模块和任务管理模块之间的通信。</p>
+<p><img src="/images/%E4%BB%BB%E5%8A%A1%E7%94%B3%E8%AF%B7.png"></p>
+<p>getTask 这部分进行了多次判断，为的是控制线程的数量，使其符合线程池的状态。如果线程池现在不应该持有那么多线程，则会返回 null 值。工作线程 Worker 会不断接收新任务去执行，而当工作线程 Worker 接收不到任务的时候，就会开始被回收。</p>
+<p><img src="/images/%E4%BB%BB%E5%8A%A1%E7%94%B3%E8%AF%B7_2.png"></p>
+<ul>
+<li>线程是可回收：调用队列的 poll(long timeout, TimeUnit unit) 方法，检索并且删除队列的头元素，如果没有足够的空间，就等待到指定的等待时间。</li>
+<li>线程是不可回收的：调用队列的 take() 方法，检索并且删除队列的头元素，如果没有足够的空间，就等待。</li>
+</ul>
+<h3 id="任务的拒绝"><a href="#任务的拒绝" class="headerlink" title="任务的拒绝"></a>任务的拒绝</h3><p><img src="/images/%E4%BB%BB%E5%8A%A1%E6%8B%92%E7%BB%9D.png"></p>
+<ul>
+<li>ThreadPoolExecutor.AbortPolicy 线程池的默认拒绝策略，也是ThreadPoolExecutor 和 ScheduledThreadPoolExecutor 的默认拒绝策略，丢弃任务，并且抛出 RejectedExecutionException 异常，建议使用这个策略，因为可以方便通过异常发现。</li>
+<li>ThreadPoolExecutor.CallerRunsPolicy 由提交任务的线程处理该任务，这种情况下，需要等到所有任务执行完毕，这种策略适合大量计算的任务类型。</li>
+<li>ThreadPoolExecutor.DiscardOldestPolicy 丢弃队列最前面的任务，然后重新提交被拒绝的任务，这种策略适合经常需要丢弃旧的任务类型。</li>
+<li>ThreadPoolExecutor.DiscardPolicy 丢弃任务，但是不抛出异常，使用这种策略会导致我们无法发现异常。</li>
+</ul>
+<h2 id="Worker-线程的管理"><a href="#Worker-线程的管理" class="headerlink" title="Worker 线程的管理"></a>Worker 线程的管理</h2><p><img src="/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E7%AE%A1%E7%90%86.png"></p>
+<h3 id="Worker-线程执行"><a href="#Worker-线程执行" class="headerlink" title="Worker 线程执行"></a>Worker 线程执行</h3><p><img src="/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C.png"></p>
+<p>thread 是在调用构造方法时通过 ThreadFactory 来创建的线程，可以用来执行任务。firstTask 用它来保存传入的第一个任务<br> Worker 是通过继承 AQS，使用不可重入的特性去反应线程现在的执行状态(可见 runWorker 方法)。</p>
+<blockquote>
+<p>tips: 所谓不可重入锁，即若当前线程执行某个方法已经获取了该锁，那么在方法中尝试再次获取锁时，就会获取不到被阻塞；所谓可重入，意味着线程可以进入它已经拥有的锁的同步代码块。</p>
+</blockquote>
+<p><img src="/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C_2.png"></p>
+<ol>
+<li>lock 方法一旦获取了独占锁，表示当前线程正在执行任务中；</li>
+<li>如果正在执行任务，则不应该中断线程；</li>
+<li>如果该线程现在不是独占锁的状态，也就是空闲的状态，说明它没有在处理任务，这时可以对该线程进行中断；</li>
+<li>线程池在执行 shutdown 方法或 tryTerminate 方法时会调用 interruptIdleWorkers 方法来中断空闲的线程，interruptIdleWorkers 方法会使用tryLock 方法来判断线程池中的线程是否是空闲状态，如果线程是空闲状态则可以安全回收。</li>
+</ol>
+<p>线程回收则应用上述特性</p>
+<p><img src="/images/%E5%B7%A5%E4%BD%9C%E7%BA%BF%E7%A8%8B%E6%89%A7%E8%A1%8C_3.png"></p>
+<h3 id="线程的回收"><a href="#线程的回收" class="headerlink" title="线程的回收"></a>线程的回收</h3><p>线程池中线程的销毁依赖 JVM 自动的回收，线程池是根据当前线程池的状态维护一定数量的线程引用，防止这部分线程被 JVM 回收，当线程池决定哪些线程需要回收时，只需要将其引用消除即可。Worker 被创建出来后，就会不断地进行轮询，然后获取任务去执行，核心线程可以无限等待获取任务，非核心线程要限时获取任务。当 Worker 无法获取到任务，也就是获取的任务为空时，循环会结束，Worker 会主动消除自身在线程池内的引用。</p>
+<p><img src="/images/%E7%BA%BF%E7%A8%8B%E5%9B%9E%E6%94%B6.png"></p>
+<p><img src="/images/%E7%BA%BF%E7%A8%8B%E5%9B%9E%E6%94%B6_2.png"></p>
+<p>在这个方法中，将线程引用移出线程池就已经结束了线程销毁的部分，但由于引起线程销毁的可能性有很多，线程池还要判断是什么引发了这次销毁，是否要改变线程池的现阶段状态，是否要根据新状态，重新分配线程。</p>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2021/02/27/SpringMVC%20%E6%A1%86%E6%9E%B6%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%B3%A8%E8%A7%A3/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="hide pull-right" href="/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="Java 线程池原理分析"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

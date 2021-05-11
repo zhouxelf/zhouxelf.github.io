@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>MySQL Explain 命令详解 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="MySQL,索引,优化," />
+  
+
+  <meta name="description" content="Explain 作用Explain 提供了 MySQL 如何执行 SQL 语句的信息，通过这些信息，可以对 SQL 语句做相应的优化，提高执行效率。 Explain 使用调用 Explain，只需要在 SQL 语句前添加 explain 关键字即可。 一般情况下，添加 explain 关键字后，认为 MySQL 不会执行查询，但是如果在 from 子句中包含子查询，那么 MySQL 实际上会执行子">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL Explain 命令详解">
+<meta property="og:url" content="https://zhouxelf.com/2018/04/06/MySQL%20Explain%20%E5%91%BD%E4%BB%A4%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="Explain 作用Explain 提供了 MySQL 如何执行 SQL 语句的信息，通过这些信息，可以对 SQL 语句做相应的优化，提高执行效率。 Explain 使用调用 Explain，只需要在 SQL 语句前添加 explain 关键字即可。 一般情况下，添加 explain 关键字后，认为 MySQL 不会执行查询，但是如果在 from 子句中包含子查询，那么 MySQL 实际上会执行子">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-04-06T01:42:43.000Z">
+<meta property="article:modified_time" content="2021-03-21T08:57:44.102Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="MySQL">
+<meta property="article:tag" content="索引">
+<meta property="article:tag" content="优化">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Explain-%E4%BD%9C%E7%94%A8"><span class="toc-text">Explain 作用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Explain-%E4%BD%BF%E7%94%A8"><span class="toc-text">Explain 使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Explain-%E5%AD%97%E6%AE%B5"><span class="toc-text">Explain 字段</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Explain-%E5%AD%97%E6%AE%B5%E8%AF%A6%E8%A7%A3"><span class="toc-text">Explain 字段详解</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#id"><span class="toc-text">id</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#select-type"><span class="toc-text">select_type</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#table"><span class="toc-text">table</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#partitions"><span class="toc-text">partitions</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#type"><span class="toc-text">type</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#possible-keys"><span class="toc-text">possible_keys</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#key"><span class="toc-text">key</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#key-len"><span class="toc-text">key_len</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ref"><span class="toc-text">ref</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rows"><span class="toc-text">rows</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#filtered"><span class="toc-text">filtered</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Extra"><span class="toc-text">Extra</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-text">注意事项</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-MySQL Explain 命令详解" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">MySQL Explain 命令详解</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2018.04.06</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="Explain-作用"><a href="#Explain-作用" class="headerlink" title="Explain 作用"></a>Explain 作用</h1><p>Explain 提供了 MySQL 如何执行 SQL 语句的信息，通过这些信息，可以对 SQL 语句做相应的优化，提高执行效率。</p>
+<h1 id="Explain-使用"><a href="#Explain-使用" class="headerlink" title="Explain 使用"></a>Explain 使用</h1><p>调用 Explain，只需要在 SQL 语句前添加 explain 关键字即可。</p>
+<p>一般情况下，添加 explain 关键字后，认为 MySQL 不会执行查询，但是如果在 from 子句中包含子查询，那么 MySQL 实际上会执行子查询，将其子查询的结果放在一个临时表中，然后完成外层查询优化。</p>
+<blockquote>
+<p>MySQL 5.6 之前的版本，只允许解释 select 语句，从 MySQL 5.6 开始，非 select 语句也可以被解释了。</p>
+</blockquote>
+<h1 id="Explain-字段"><a href="#Explain-字段" class="headerlink" title="Explain 字段"></a>Explain 字段</h1><p>调用 Explain 后，MySQL 会返回一行或者多行记录，通过这些记录就可以知道 SQL 语句的执行情况了。</p>
+<p>每行记录都包含了以下几个字段</p>
+<ul>
+<li>id：执行编号，标识 select 所属的行</li>
+<li>select_type：select 查询的类型</li>
+<li>table：查询的是哪个表</li>
+<li>partitions：匹配的分区</li>
+<li>type：关联类型，或者访问类型</li>
+<li>possible_keys：该查询可以选用的索引</li>
+<li>key：该查询选用的索引</li>
+<li>key_len：索引中使用的字节数</li>
+<li>ref：显示上述表的连接匹配条件，即哪些列或常量被用于查询索引列上的值</li>
+<li>rows：估计为了找到所需行而要读取的行数</li>
+<li>filtered：按表条件过滤的行的百分比</li>
+<li>Extra：额外的信息</li>
+</ul>
+<h1 id="Explain-字段详解"><a href="#Explain-字段详解" class="headerlink" title="Explain 字段详解"></a>Explain 字段详解</h1><h2 id="id"><a href="#id" class="headerlink" title="id"></a>id</h2><p>该列总是包含一个编号，标识 select 所属的行。如果语句当中没有子查询或联合查询，那么只会有唯一的 select，于是每一行在这个列中都将显示一个 1。否则，内层的 select 语句一般会顺序编号，对应于原始语句中的位置。</p>
+<p>id 值越大，越先执行。</p>
+<h2 id="select-type"><a href="#select-type" class="headerlink" title="select_type"></a>select_type</h2><p>该列指明了查询的类型，以下为常见的取值</p>
+<ul>
+<li>SIMPLLE：简单查询，该查询不包含 UNION 或子查询</li>
+<li>PRIMARY：如果查询包含 UNION 或子查询，则最外层的查询被标识为 PRIMARY</li>
+<li>UNION：表示此查询是 UNION 中的第二个或者随后的查询</li>
+<li>DEPENDENT：UNION 满足 UNION 中的第二个或者随后的查询，其次取决于外面的查询</li>
+<li>UNION RESULT：UNION 的结果</li>
+<li>SUBQUERY：子查询中的第一个 select 语句</li>
+<li>DEPENDENT SUBQUERY：子查询中的 第一个 select，同时取决于外面的查询</li>
+<li>DERIVED：派生表 select，包含在 from 字句的子查询中的查询</li>
+<li>UNCACHEABLE SUBQUERY：满足是子查询中的第一个 select 语句，同时意味着 select 中的某些特性阻止结果被缓存于一个 Item_cache 中</li>
+<li>UNCACHEABLE UNION：满足此查询是 UNION 中的第二个或者随后的查询，同时意味着 select 中的某些特性阻止结果被缓存于一个 Item_cache 中</li>
+</ul>
+<h2 id="table"><a href="#table" class="headerlink" title="table"></a>table</h2><p>该列显示了对应行正在访问哪个表，或者该表的别名。</p>
+<h2 id="partitions"><a href="#partitions" class="headerlink" title="partitions"></a>partitions</h2><p>记录将与查询匹配的分区，非分区表的值为NULL。</p>
+<h2 id="type"><a href="#type" class="headerlink" title="type"></a>type</h2><p>该列称为关联类型或者访问类型，它指明了 MySQL 决定如何查找表中符合条件的行，同时为判断查询是否高效提供了重要的依据。</p>
+<p>以下为常见的取值</p>
+<ul>
+<li>ALL：全表扫描，这个类型是性能最差的查询之一。通常来说，我们的查询不应该出现 ALL 类型，因为这样的查询，在数据量最大的情况下，对数据库的性能是巨大的灾难。</li>
+<li>index：全索引扫描，和 ALL 类型类似，只不过 ALL 类型是全表扫描，而 index 类型是扫描全部的索引，主要优点是避免了排序，但是开销仍然非常大。如果在 Extra 列看到 Using index，说明正在使用覆盖索引，只扫描索引的数据，它比按索引次序全表扫描的开销要少很多。</li>
+<li>range：范围扫描，就是一个有限制的索引扫描，它开始于索引里的某一点，返回匹配这个值域的行。这个类型通常出现在 =、&lt;&gt;、&gt;、&gt;=、&lt;、&lt;=、IS NULL、&lt;=&gt;、BETWEEN、IN() 的操作中，key 列显示使用了哪个索引，当 type 为该值时，则输出的 ref 列为 NULL，并且 key_len 列是此次查询中使用到的索引最长的那个。</li>
+<li>ref：一种索引访问，也称索引查找，它返回所有匹配某个单个值的行。此类型通常出现在多表的 join 查询, 针对于非唯一或非主键索引, 或者是使用了最左前缀规则索引的查询。</li>
+<li>eq_ref：使用这种索引查找，最多只返回一条符合条件的记录。在使用唯一性索引或主键查找时会出现该值，非常高效。</li>
+<li>const、system：该表至多有一个匹配行，在查询开始时读取，或者该表是系统表，只有一行匹配。其中 const 用于在和 primary key 或 unique 索引中有固定值比较的情形。</li>
+<li>NULL：在执行阶段不需要访问表。</li>
+</ul>
+<p>该列取不同值的执行效率依次是</p>
+<p>ALL &lt; index &lt; range &lt; ref &lt; eq_ref &lt; const &lt; system &lt; NULL</p>
+<p>一般来说，至少要保证查询达到 range 级别，最好能达到 ref 级别。</p>
+<h2 id="possible-keys"><a href="#possible-keys" class="headerlink" title="possible_keys"></a>possible_keys</h2><p>该列显示了查询可以选用哪些索引，但是列出来的索引，可能对于后续优化过程是没有用的。</p>
+<h2 id="key"><a href="#key" class="headerlink" title="key"></a>key</h2><p>该列显示了查询选用了哪个索引，如果该索引没有出现在 possible_keys 列中，那么选用它可能出于另外的原因，比如，它可能选择了一个覆盖索引。</p>
+<h2 id="key-len"><a href="#key-len" class="headerlink" title="key_len"></a>key_len</h2><p>该列显示了在索引里使用的字节数，当 key 列的值为 NULL 时，则该列也是 NULL。如果正在使用的只是索引里的某些列，那么可以通过用该列的值算出来具体是哪些列。</p>
+<h2 id="ref"><a href="#ref" class="headerlink" title="ref"></a>ref</h2><p>该列显示了哪些字段或者常量被用来和 key 配合从表中查询记录出来。</p>
+<h2 id="rows"><a href="#rows" class="headerlink" title="rows"></a>rows</h2><p>该列显示了估计要找到所需的行而要读取的行数，这个值是个估计值，原则上值越小越好。</p>
+<h2 id="filtered"><a href="#filtered" class="headerlink" title="filtered"></a>filtered</h2><p>该列表示根据条件过滤的表行的估计百分比，和 rows 相乘，表示和查询计划里前一个表关联的行数。</p>
+<h2 id="Extra"><a href="#Extra" class="headerlink" title="Extra"></a>Extra</h2><p>该列显示了有关 MySQL 如何解析查询的其它信息。</p>
+<p>以下为常见的取值</p>
+<ul>
+<li>Using index：使用覆盖索引，表示查询索引就可查到所需数据，不用扫描表数据文件，往往说明性能不错。</li>
+<li>Using Where：在存储引擎检索行后再进行过滤，使用了 where 从句来限制哪些行将与下一张表匹配或者是返回给用户。</li>
+<li>Using temporary：在查询结果排序时会使用一个临时表，一般出现于排序、分组和多表 join 的情况，查询效率不高，建议优化。</li>
+<li>Using filesort：对结果使用一个外部索引排序，而不是按索引次序从表里读取行，一般有出现该值，都建议优化去掉，因为这样的查询 CPU 资源消耗大。</li>
+</ul>
+<h1 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h1><p>Explain 不会告诉你触发器、存储过程或用户自定义函数对查询的影响情况；<br>Explain 不会告诉你 MySQL 在查询执行中所做的特定优化；<br>Explain 只是个近似结果；<br>Explain 不会显示关于查询的执行计划的所有信息。<br><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2018/03/27/%E8%B0%88%E8%B0%88%E5%94%AF%E4%B8%80%E7%BA%A6%E6%9D%9F%E5%92%8C%E5%94%AF%E4%B8%80%E7%B4%A2%E5%BC%95/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2018/04/14/MySQL%20%E4%B9%8B%E5%85%A8%E6%96%87%E7%B4%A2%E5%BC%95/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="MySQL Explain 命令详解"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

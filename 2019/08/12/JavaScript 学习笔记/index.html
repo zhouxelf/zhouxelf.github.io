@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>JavaScript 学习笔记 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="JavaScript," />
+  
+
+  <meta name="description" content="基础部分 Js 严格区分大小写 Js 不区分整数和浮点数，统一用 Number 表示 &#x3D;&#x3D; 自动转换数据类型再比较，**&#x3D;&#x3D;&#x3D;** 不会转换数据类型，应始终坚持用 &#x3D;&#x3D;&#x3D; 比较 NaN 非数字值 (Not a Number) 检测使用 isNaN() 函数 null 和 undefined 基本同义，大多数情况下都应该用 null，null 表示”没有对象”，即此处不应该有值，undefined">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 学习笔记">
+<meta property="og:url" content="https://zhouxelf.com/2019/08/12/JavaScript%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="基础部分 Js 严格区分大小写 Js 不区分整数和浮点数，统一用 Number 表示 &#x3D;&#x3D; 自动转换数据类型再比较，**&#x3D;&#x3D;&#x3D;** 不会转换数据类型，应始终坚持用 &#x3D;&#x3D;&#x3D; 比较 NaN 非数字值 (Not a Number) 检测使用 isNaN() 函数 null 和 undefined 基本同义，大多数情况下都应该用 null，null 表示”没有对象”，即此处不应该有值，undefined">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-08-12T14:56:23.000Z">
+<meta property="article:modified_time" content="2021-04-21T15:32:29.594Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="JavaScript">
+<meta name="twitter:card" content="summary">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E9%83%A8%E5%88%86"><span class="toc-text">基础部分</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-JavaScript 学习笔记" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">JavaScript 学习笔记</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2019.08.12</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%89%8D%E7%AB%AF/">前端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h3 id="基础部分"><a href="#基础部分" class="headerlink" title="基础部分"></a>基础部分</h3><ol>
+<li>Js 严格区分大小写</li>
+<li>Js 不区分整数和浮点数，统一用 Number 表示</li>
+<li><strong>==</strong> 自动转换数据类型再比较，**===** 不会转换数据类型，应始终坚持用 <strong>===</strong> 比较</li>
+<li>NaN 非数字值 (Not a Number) 检测使用 <strong>isNaN()</strong> 函数</li>
+<li>null 和 undefined 基本同义，大多数情况下都应该用 null，null 表示”没有对象”，即此处不应该有值，undefined 表示”缺少值”，就是此处应该有一个值，但是还没有定义，详见<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2014/03/undefined-vs-null.html">阮一峰</a></li>
+<li>数组用 <strong>[ ]</strong> 表示，也可以用 <strong>Array()</strong> 函数实现，使用索引访问</li>
+<li>JS 对象，键是字符串类型，值任意类型<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">    name:<span class="string">&#x27;Bob&#x27;</span>,</span><br><span class="line">    age:<span class="number">20</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></li>
+<li>判断一个对象的属性是否存在(含继承) <strong>in</strong>，(不含继承) <strong>hasOwnProperty()</strong></li>
+<li><strong>strict 模式</strong>会强制 <strong>var</strong> 关键字申明变量，详见<a target="_blank" rel="noopener" href="http://www.ruanyifeng.com/blog/2013/01/javascript_strict_mode.html">阮一峰</a></li>
+<li>多行字符串，使用 <strong>\n</strong> 转义，最新 <strong>ES6</strong> 可以使用反引号 <strong>···</strong></li>
+<li>字符串连接，使用 **+**，最新 <strong>ES6</strong> 可以使用 **${变量名}**，必须使用反引号</li>
+<li>判断条件，JavaScript把 <strong>null、undefined、0、NaN、’ ‘</strong> 视为 false，其他值一概视为 true</li>
+<li>循环输出，<strong>for…in</strong> 输出对象的所有属性，输出数组的索引</li>
+<li>循环输出，<strong>for···of</strong> 输出数组的值 <strong>ES6</strong> </li>
+<li><strong>ES6</strong> 中新增的数据类型 <strong>Map、Set</strong>，以及 <strong>iterable</strong> ，<strong>Set</strong> 只存储键，键不能重复，<strong>Map、Set、Array</strong> 均属于 <strong>iterable</strong> 类型，均可通过 <strong>forEach()</strong> 遍历<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> m = <span class="keyword">new</span> <span class="built_in">Map</span>([</span><br><span class="line">    [<span class="string">&#x27;Michael&#x27;</span>, <span class="number">95</span>],</span><br><span class="line">    [<span class="string">&#x27;Bob&#x27;</span>, <span class="number">75</span>],</span><br><span class="line">    [<span class="string">&#x27;Tracy&#x27;</span>, <span class="number">85</span>]</span><br><span class="line">]);</span><br><span class="line">m.set(<span class="string">&#x27;Adam&#x27;</span>, <span class="number">67</span>); <span class="comment">//添加新元素</span></span><br><span class="line">m.get(<span class="string">&#x27;Bob&#x27;</span>); <span class="comment">//获取元素</span></span><br><span class="line">m.has(<span class="string">&#x27;Bob&#x27;</span>); <span class="comment">//判断存在</span></span><br><span class="line">m.delete(<span class="string">&#x27;Bob&#x27;</span>); <span class="comment">//删除元素</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> a = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>];</span><br><span class="line">a.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">element, index, array</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// element:指向当前元素的值</span></span><br><span class="line">    <span class="comment">// index:指向当前索引</span></span><br><span class="line">    <span class="comment">// array:指向 Array 对象本身</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Set</span>([<span class="string">&#x27;A&#x27;</span>, <span class="string">&#x27;B&#x27;</span>, <span class="string">&#x27;C&#x27;</span>]);</span><br><span class="line">b.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">element, sameElement, set</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 前两个参数均为当前元素</span></span><br><span class="line">    <span class="comment">// set:指向当前 Set</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">var</span> c = <span class="keyword">new</span> <span class="built_in">Map</span>([[<span class="number">1</span>, <span class="string">&#x27;x&#x27;</span>], [<span class="number">2</span>, <span class="string">&#x27;y&#x27;</span>], [<span class="number">3</span>, <span class="string">&#x27;z&#x27;</span>]]);</span><br><span class="line">c.forEach(<span class="function"><span class="keyword">function</span> (<span class="params">value, key, map</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// value: 指向当前元素的值</span></span><br><span class="line">    <span class="comment">// key: 指向当前元素的键</span></span><br><span class="line">    <span class="comment">// map: 指向当前 Map</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<ol start="16">
+<li>函数内部关键字 <strong>arguments</strong>，永远指向当前函数的调用者传入的所有参数</li>
+<li>变量提升，JavaScript 的函数定义特点，先扫描整个函数体的语句，把所有申明的变量“提升”到函数顶部</li>
+<li>var和let，<strong>let</strong> 声明块级作用域，<strong>const</strong> 声明常量</li>
+<li>高阶函数 <strong>map()<strong>、</strong>reduce()</strong><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> pow = <span class="function"><span class="keyword">function</span> (<span class="params">x</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x*x;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>];</span><br><span class="line"><span class="keyword">var</span> arr2 = arr.map(pow);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>];</span><br><span class="line"><span class="keyword">var</span> b = arr.reduce(<span class="function"><span class="keyword">function</span> (<span class="params">x, y</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x + y;</span><br><span class="line">&#125;);</span><br><span class="line">alert(b); <span class="comment">//返回 15</span></span><br></pre></td></tr></table></figure>
+<ol start="20">
+<li><strong>filter()</strong> 接收一个函数，将函数作用于 Array 中的每一个元素，根据返回值是 true 或 false，来决定是否保留该元素<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> arr = [<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>];</span><br><span class="line"><span class="keyword">var</span> b = arr.filter(<span class="function"><span class="keyword">function</span> (<span class="params">x</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x % <span class="number">2</span> == <span class="number">0</span>;</span><br><span class="line">&#125;);</span><br><span class="line">alert(b); <span class="comment">//返回 2,4</span></span><br></pre></td></tr></table></figure></li>
+<li>闭包，函数作为返回值，并且相关参数和变量都保存在返回的函数中；使用闭包时，返回函数不要引用任何循环变量，或者后续会发生变化的变量，如若使用，须创建一个函数，用该函数的参数绑定循环变量当前的值<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">count</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> arr = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; i&lt;=<span class="number">3</span>; i++) &#123;</span><br><span class="line">        arr.push(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> i*i;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> results = count();</span><br><span class="line"><span class="keyword">var</span> f1 = results[<span class="number">0</span>];  </span><br><span class="line"><span class="keyword">var</span> f2 = results[<span class="number">1</span>];</span><br><span class="line"><span class="keyword">var</span> f3 = results[<span class="number">2</span>];</span><br><span class="line">f1(); <span class="comment">// 16</span></span><br><span class="line">f2(); <span class="comment">// 16</span></span><br><span class="line">f3(); <span class="comment">// 16</span></span><br></pre></td></tr></table></figure></li>
+</ol>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">count</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> arr = [];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i=<span class="number">1</span>; i&lt;=<span class="number">3</span>; i++) &#123;</span><br><span class="line">        arr.push((<span class="function"><span class="keyword">function</span> (<span class="params">n</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> n * n;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)(i));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> arr;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> results = count();</span><br><span class="line"><span class="keyword">var</span> f1 = results[<span class="number">0</span>];</span><br><span class="line"><span class="keyword">var</span> f2 = results[<span class="number">1</span>];</span><br><span class="line"><span class="keyword">var</span> f3 = results[<span class="number">2</span>];</span><br><span class="line">f1(); <span class="comment">// 1</span></span><br><span class="line">f2(); <span class="comment">// 4</span></span><br><span class="line">f3(); <span class="comment">// 9</span></span><br></pre></td></tr></table></figure>
+<ol start="22">
+<li>创建一个匿名函数并立刻执行<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">x</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x * x;</span><br><span class="line">&#125;)(<span class="number">3</span>); <span class="comment">//9</span></span><br></pre></td></tr></table></figure></li>
+<li>箭头函数完全修复了函数内部使用 <strong>this</strong> 关键字的指向问题</li>
+<li>关于包装对象<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">1. 不要使用new Number()、new Boolean()、new String()创建包装对象</span><br><span class="line">2. 用parseInt()或parseFloat()来转换任意类型到number</span><br><span class="line">3. 用String()来转换任意类型到string，或者直接调用某个对象的toString()方法</span><br><span class="line">4. 通常不必把任意类型转换为boolean再判断，因为可以直接写if (myVar) &#123;...&#125;</span><br><span class="line">5. typeof操作符可以判断出number、boolean、string、function和undefined</span><br><span class="line">6. 判断Array要使用Array.isArray(arr)</span><br><span class="line">7. 判断null请使用myVar &#x3D;&#x3D;&#x3D; null</span><br><span class="line">8. 判断某个全局变量是否存在用typeof window.myVar &#x3D;&#x3D;&#x3D; &#39;undefined&#39;</span><br><span class="line">9. 函数内部判断某个变量是否存在用typeof myVar &#x3D;&#x3D;&#x3D; &#39;undefined&#39;</span><br></pre></td></tr></table></figure></li>
+<li>面向对象编程，<strong>原型链</strong>，JavaScipt 的原型链和 Java 的 Class 的区别就在，它没有 “Class” 的概念，所有的对象都是实例，所谓继承关系不过是把一个对象的原型指向另一个对象而已<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> Student = &#123; <span class="comment">// 原型对象</span></span><br><span class="line">    name: <span class="string">&#x27;Robot&#x27;</span>,</span><br><span class="line">    height: <span class="number">1.8</span>,</span><br><span class="line">    run: <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="built_in">this</span>.name + <span class="string">&#x27; is running...&#x27;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createStudent</span> (<span class="params">name</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 基于 Student 原型创建一个新对象</span></span><br><span class="line">    <span class="keyword">var</span> s = <span class="built_in">Object</span>.create(Student);</span><br><span class="line">    <span class="comment">// 初始化新对象</span></span><br><span class="line">    s.name = name;</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> xiaoming = createStudent(<span class="string">&#x27;小明&#x27;</span>);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2019/07/03/Redis%20%E5%A4%8D%E5%88%B6%E3%80%81%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%81%E9%99%84%E5%8A%A0%E5%8A%9F%E8%83%BD/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2019/09/04/Vue.js%20%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%E4%B9%8B%E5%9F%BA%E7%A1%80%E7%AF%87/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="JavaScript 学习笔记"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

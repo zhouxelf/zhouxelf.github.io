@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>PHP 实现邮件发送(PHPMailer+QQ邮箱) | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="PHP," />
+  
+
+  <meta name="description" content="最近复习原生 PHP，看到邮件函数这一部分，就试着写一下邮件功能，在网上搜了一下，主要有两种实现方式：  PHP 自带的 mail() 函数 封装的 smtp 邮件发送类  下面来一一介绍 PHP 自带的 mail() 函数浏览一下 PHP 文档，mail() 函数的注释如下：  即若要使用 mail() 函数，需要本地安装一个邮件系统或者必须设置一台不需要中继的邮件发送服务器，但现在要找到一台不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PHP 实现邮件发送(PHPMailer+QQ邮箱)">
+<meta property="og:url" content="https://zhouxelf.com/2017/03/13/PHP%20%E5%AE%9E%E7%8E%B0%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81(PHPMailer+QQ%E9%82%AE%E7%AE%B1)/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="最近复习原生 PHP，看到邮件函数这一部分，就试着写一下邮件功能，在网上搜了一下，主要有两种实现方式：  PHP 自带的 mail() 函数 封装的 smtp 邮件发送类  下面来一一介绍 PHP 自带的 mail() 函数浏览一下 PHP 文档，mail() 函数的注释如下：  即若要使用 mail() 函数，需要本地安装一个邮件系统或者必须设置一台不需要中继的邮件发送服务器，但现在要找到一台不">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_1.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_2.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_3.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_4.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_5.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_6.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_7.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_8.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_9.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_10.png">
+<meta property="og:image" content="https://zhouxelf.com/images/PHPMailer_11.png">
+<meta property="article:published_time" content="2017-03-13T05:05:03.000Z">
+<meta property="article:modified_time" content="2021-03-21T08:57:44.104Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="PHP">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/PHPMailer_1.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#PHP-%E8%87%AA%E5%B8%A6%E7%9A%84-mail-%E5%87%BD%E6%95%B0"><span class="toc-text">PHP 自带的 mail() 函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%81%E8%A3%85%E7%9A%84-smtp-%E9%82%AE%E4%BB%B6%E5%8F%91%E9%80%81%E7%B1%BB"><span class="toc-text">封装的 smtp 邮件发送类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85-%E6%8E%A8%E8%8D%90"><span class="toc-text">最小化安装(推荐)</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-PHP 实现邮件发送(PHPMailer+QQ邮箱)" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">PHP 实现邮件发送(PHPMailer+QQ邮箱)</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2017.03.13</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <p>最近复习原生 PHP，看到邮件函数这一部分，就试着写一下邮件功能，在网上搜了一下，主要有两种实现方式：</p>
+<ol>
+<li>PHP 自带的 mail() 函数</li>
+<li>封装的 smtp 邮件发送类</li>
+</ol>
+<p>下面来一一介绍</p>
+<h2 id="PHP-自带的-mail-函数"><a href="#PHP-自带的-mail-函数" class="headerlink" title="PHP 自带的 mail() 函数"></a>PHP 自带的 mail() 函数</h2><p>浏览一下 PHP 文档，mail() 函数的注释如下：</p>
+<p><img src="/images/PHPMailer_1.png"></p>
+<p>即若要使用 mail() 函数，需要本地安装一个邮件系统或者必须设置一台不需要中继的邮件发送服务器，但现在要找到一台不需要身份验证的邮件发送中继几乎不可能，所以使用 mail() 函数往往无法成功发送电子邮件，对使用邮件系统感兴趣的，可以自己研究。而使用封装的smtp邮件发送类来实现，则要方便的多。</p>
+<h2 id="封装的-smtp-邮件发送类"><a href="#封装的-smtp-邮件发送类" class="headerlink" title="封装的 smtp 邮件发送类"></a>封装的 smtp 邮件发送类</h2><p>封装的smtp邮件发送类，网上可以找到很多，其中开源的 PHPMailer 是其中比较流行的一个，只需简单配置，即可使用，想了解更多，请移步 <a target="_blank" rel="noopener" href="http://baike.baidu.com/link?url=gK7jI0Z90YK7TgX-dbAtjva9_5K3J119D2Q2T8zfZY24AC1Q5oWduRHzTPwJiPV7SEQ3MCFtURg4GXb-Dzh8rdit8iiawGyIR9fK8tNCxZ_">PHPMailer</a> PHPMailer开源地址:<a target="_blank" rel="noopener" href="https://github.com/PHPMailer/PHPMailer">https://github.com/PHPMailer/PHPMailer</a></p>
+<p>可以直接把项目 clone 下来，或者下载 zip 压缩文件，在配置之前，需要开启邮箱的 smtp 功能，这里以 QQ 邮箱为例：</p>
+<p>登录 QQ 邮箱，点击<strong>设置</strong></p>
+<p><img src="/images/PHPMailer_2.png"></p>
+<p><strong>账户</strong></p>
+<p><img src="/images/PHPMailer_3.png"></p>
+<p>拉到最后，找到</p>
+<p><img src="/images/PHPMailer_4.png"></p>
+<p>根据提示，开启前两项服务，然后生成授权码，记下来，之后配置会用</p>
+<p><img src="/images/PHPMailer_5.png"></p>
+<p>clone 下来的 PHPMailer 项目的 README 文件提供了一个简单的引入例子<br><strong>A Simple Example</strong></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require</span> <span class="string">&#x27;PHPMailerAutoload.php&#x27;</span>;</span><br><span class="line"><span class="variable">$mail</span> = <span class="keyword">new</span> PHPMailer;</span><br><span class="line"><span class="comment">//$mail-&gt;SMTPDebug = 3;  // Enable verbose debug output</span></span><br><span class="line">              </span><br><span class="line"><span class="variable">$mail</span>-&gt;isSMTP();  <span class="comment">// Set mailer to use SMTP</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;Host = <span class="string">&#x27;smtp1.example.com;smtp2.example.com&#x27;</span>;  <span class="comment">// Specify main and backup SMTP servers</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;SMTPAuth = <span class="literal">true</span>;   <span class="comment">// Enable SMTP authentication</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;Username = <span class="string">&#x27;user@example.com&#x27;</span>;  <span class="comment">// SMTP username</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;Password = <span class="string">&#x27;secret&#x27;</span>;  <span class="comment">// SMTP password</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;SMTPSecure = <span class="string">&#x27;tls&#x27;</span>;  <span class="comment">// Enable TLS encryption, `ssl` also accepted</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;Port = <span class="number">587</span>;  <span class="comment">// TCP port to connect to</span></span><br><span class="line">                 </span><br><span class="line"><span class="variable">$mail</span>-&gt;setFrom(<span class="string">&#x27;from@example.com&#x27;</span>, <span class="string">&#x27;Mailer&#x27;</span>);</span><br><span class="line"><span class="variable">$mail</span>-&gt;addAddress(<span class="string">&#x27;joe@example.net&#x27;</span>, <span class="string">&#x27;Joe User&#x27;</span>);  <span class="comment">// Add a recipient</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;addAddress(<span class="string">&#x27;ellen@example.com&#x27;</span>);  <span class="comment">// Name is optional</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;addReplyTo(<span class="string">&#x27;info@example.com&#x27;</span>, <span class="string">&#x27;Information&#x27;</span>);</span><br><span class="line"><span class="variable">$mail</span>-&gt;addCC(<span class="string">&#x27;cc@example.com&#x27;</span>);</span><br><span class="line"><span class="variable">$mail</span>-&gt;addBCC(<span class="string">&#x27;bcc@example.com&#x27;</span>);</span><br><span class="line">                        </span><br><span class="line"><span class="variable">$mail</span>-&gt;addAttachment(<span class="string">&#x27;/var/tmp/file.tar.gz&#x27;</span>);  <span class="comment">// Add attachments</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;addAttachment(<span class="string">&#x27;/tmp/image.jpg&#x27;</span>, <span class="string">&#x27;new.jpg&#x27;</span>);  <span class="comment">// Optional name</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;isHTML(<span class="literal">true</span>);  <span class="comment">// Set email format to HTML</span></span><br><span class="line"><span class="variable">$mail</span>-&gt;Subject = <span class="string">&#x27;Here is the subject&#x27;</span>;</span><br><span class="line"><span class="variable">$mail</span>-&gt;Body    = <span class="string">&#x27;This is the HTML message body &lt;b&gt;in bold!&lt;/b&gt;&#x27;</span>;</span><br><span class="line"><span class="variable">$mail</span>-&gt;AltBody = <span class="string">&#x27;This is the body in plain text for non-HTML mail clients&#x27;</span>;</span><br><span class="line"><span class="keyword">if</span>(!<span class="variable">$mail</span>-&gt;send()) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Message could not be sent.&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Mailer Error: &#x27;</span> . <span class="variable">$mail</span>-&gt;ErrorInfo;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;Message has been sent&#x27;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 PHPMailer 文件夹下，新建一个 index.php 文件，复制粘贴以上代码，修改各项配置</p>
+<p><img src="/images/PHPMailer_6.png"></p>
+<p>由于使用了 SSL 连接，所以需要开启PHP的 openssl 扩展，这里不再赘述，配置完之后，放在 Web 服务器下，访问 index.php，正常的话，就能收到一封测试邮件了，如果失败，可以根据报错信息进行排查。</p>
+<h2 id="最小化安装-推荐"><a href="#最小化安装-推荐" class="headerlink" title="最小化安装(推荐)"></a>最小化安装(推荐)</h2><p>直接把整个 PHPMailer 项目放到服务器上，未免太浪费空间，而且项目中的许多文件都是没用的，所以 README 文件中也提到了最小化安装</p>
+<p><img src="/images/PHPMailer_7.png"></p>
+<p>文中提到 <strong>class.phpmailer.php</strong> 是必需的，另外的文件是可选的，因为我们使用的是 SMTP，所以还需要<strong>class.smtp.php</strong>，如果你使用了 POP3，则需要引入 <strong>class.pop3.php</strong>，新建一个 Mail 文件夹，导入以上两个文件，新建 index.html,send.php，文件结构如下:</p>
+<p><img src="/images/PHPMailer_8.png"></p>
+<p>两个文件代码如下</p>
+<p>index.html </p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span> <span class="attr">lang</span>=<span class="string">&quot;zh-CN&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">&quot;UTF-8&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">title</span>&gt;</span>phpmailer Unit Test<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">h3</span>&gt;</span>phpmailer Unit Test<span class="tag">&lt;/<span class="name">h3</span>&gt;</span></span><br><span class="line">	请你输入<span class="tag">&lt;<span class="name">font</span> <span class="attr">color</span>=<span class="string">&quot;#FF6666&quot;</span>&gt;</span>收信<span class="tag">&lt;/<span class="name">font</span>&gt;</span>的邮箱地址:</span><br><span class="line">	<span class="tag">&lt;<span class="name">form</span> <span class="attr">name</span>=<span class="string">&quot;phpmailer&quot;</span> <span class="attr">action</span>=<span class="string">&quot;./send.php&quot;</span> <span class="attr">method</span>=<span class="string">&quot;post&quot;</span>&gt;</span></span><br><span class="line">	邮箱地址: <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;text&quot;</span> <span class="attr">size</span>=<span class="string">&quot;50&quot;</span> <span class="attr">name</span>=<span class="string">&quot;address&quot;</span> /&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">br</span>/&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">&quot;submit&quot;</span> <span class="attr">value</span>=<span class="string">&quot;发送&quot;</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">form</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>send.php</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">	<span class="keyword">require</span>(<span class="string">&quot;class.phpmailer.php&quot;</span>);  <span class="comment">//下载的文件必须放在该文件所在目录</span></span><br><span class="line">	<span class="keyword">require</span>(<span class="string">&quot;class.smtp.php&quot;</span>);</span><br><span class="line">	<span class="variable">$mail</span> = <span class="keyword">new</span> PHPMailer();  <span class="comment">//建立邮件发送类</span></span><br><span class="line">	<span class="variable">$address</span> = <span class="variable">$_POST</span>[<span class="string">&#x27;address&#x27;</span>];</span><br><span class="line">	<span class="variable">$mail</span>-&gt;IsSMTP();  <span class="comment">// 使用SMTP方式发送</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;CharSet=<span class="string">&#x27;UTF-8&#x27;</span>;  <span class="comment">// 设置邮件的字符编码</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;Host = <span class="string">&quot;smtp.qq.com&quot;</span>;  <span class="comment">// 您的企业邮局域名</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;SMTPAuth = <span class="literal">true</span>;  <span class="comment">// 启用SMTP验证功能</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;SMTPSecure = <span class="string">&quot;ssl&quot;</span>;</span><br><span class="line">	<span class="variable">$mail</span>-&gt;Port = <span class="string">&quot;465&quot;</span>;  <span class="comment">//SMTP端口</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;Username = <span class="string">&quot;xxx@qq.com&quot;</span>;  <span class="comment">// 邮箱用户名(请填写完整的email地址)</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;Password = <span class="string">&quot;xxx&quot;</span>;  <span class="comment">// 授权码</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;From = <span class="string">&quot;xxx@qq.com&quot;</span>;  <span class="comment">//邮件发送者email地址</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;FromName = <span class="string">&quot;您的名称&quot;</span>;</span><br><span class="line">	<span class="variable">$mail</span>-&gt;AddAddress(<span class="string">&quot;<span class="subst">$address</span>&quot;</span>, <span class="string">&quot;&quot;</span>);  <span class="comment">//收件人地址(&quot;收件人email&quot;,&quot;收件人姓名&quot;)</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;AddReplyTo(<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">	<span class="variable">$mail</span>-&gt;AddAttachment(<span class="string">&quot;/var/tmp/file.tar.gz&quot;</span>);   <span class="comment">// 添加附件</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;IsHTML(<span class="literal">true</span>);   <span class="comment">// set email format to HTML //是否使用HTML格式</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;Subject = <span class="string">&quot;PHPMailer测试邮件&quot;</span>;  <span class="comment">//邮件标题</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;Body = <span class="string">&quot;Hello,这是测试邮件&quot;</span>;  <span class="comment">//邮件内容</span></span><br><span class="line">	<span class="variable">$mail</span>-&gt;AltBody = <span class="string">&quot;This is the body in plain text for non-HTML mail clients&quot;</span>;  <span class="comment">//附加信息</span></span><br><span class="line">	<span class="keyword">if</span>(!<span class="variable">$mail</span>-&gt;Send())&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">&quot;邮件发送失败. &lt;p&gt;&quot;</span>;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">&quot;错误原因: &quot;</span> . <span class="variable">$mail</span>-&gt;ErrorInfo;</span><br><span class="line">		<span class="keyword">exit</span>;</span><br><span class="line">	&#125;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">&quot;邮件发送成功&quot;</span>;</span><br><span class="line">	<span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>配置参数和上面的一样，不再赘述，之后点击 index.html 文件</p>
+<p><img src="/images/PHPMailer_9.png"></p>
+<p>输入邮箱地址就可以啦</p>
+<p><img src="/images/PHPMailer_10.png"></p>
+<p><img src="/images/PHPMailer_11.png"></p>
+<p><strong>以上代码均为测试，若用于生产环境，可以对其进行封装</strong><br><strong>如有问题，欢迎回复交流</strong><br><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2017/01/05/%E5%85%B3%E4%BA%8E%E6%9C%AC%E5%8D%9A%E5%AE%A2/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2017/06/03/JavaScript%20%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%9A%84%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%87%BD%E6%95%B0/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="PHP 实现邮件发送(PHPMailer+QQ邮箱)"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>

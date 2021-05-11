@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+
+  <html class="light page-post">
+
+
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java 之线程安全 | 潜心做事</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  
+    <meta name="keywords" content="Java,线程,线程安全," />
+  
+
+  <meta name="description" content="线程安全含义Java 中多线程编程极大地提高了效率，但是也会带来一些隐患，这就是 Java 中的线程安全问题。 在单线程中不会出现线程安全问题，而在多线程编程中，有可能出现同时访问同一个资源的情况，这种资源可以是：一个变量、一个对象、一个文件、一个数据表等，而多个线程同时访问同一资源的时候，就会存在一个问题。 线程是 CPU 调度的最小单元，通俗来讲就是，线程的代码是按照顺序来执行的，执行完毕就是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 之线程安全">
+<meta property="og:url" content="https://zhouxelf.com/2020/05/07/Java%20%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8/index.html">
+<meta property="og:site_name" content="潜心做事">
+<meta property="og:description" content="线程安全含义Java 中多线程编程极大地提高了效率，但是也会带来一些隐患，这就是 Java 中的线程安全问题。 在单线程中不会出现线程安全问题，而在多线程编程中，有可能出现同时访问同一个资源的情况，这种资源可以是：一个变量、一个对象、一个文件、一个数据表等，而多个线程同时访问同一资源的时候，就会存在一个问题。 线程是 CPU 调度的最小单元，通俗来讲就是，线程的代码是按照顺序来执行的，执行完毕就是">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zhouxelf.com/images/JMM_1.png">
+<meta property="og:image" content="https://zhouxelf.com/images/JMM_2.png">
+<meta property="article:published_time" content="2020-05-07T11:24:45.000Z">
+<meta property="article:modified_time" content="2021-04-21T15:32:29.594Z">
+<meta property="article:author" content="zhouxelf">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="线程">
+<meta property="article:tag" content="线程安全">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zhouxelf.com/images/JMM_1.png">
+
+  
+
+  
+    <link rel="icon" href="/favicon.ico">
+  
+
+  <link href="/css/styles.css?v=c114cbeddx" rel="stylesheet">
+
+
+  
+    
+<link rel="stylesheet" href="/css/personal-style.css">
+
+  
+
+  
+
+  
+
+  
+
+
+  
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.3.0/css/font-awesome.min.css">
+  
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+<body>
+
+
+  
+    <span id="toolbox-mobile" class="toolbox-mobile">导航</span>
+  
+
+  <div class="post-header CENTER">
+   
+  <div class="toolbox">
+    <a class="toolbox-entry" href="/">
+      <span class="toolbox-entry-text">导航</span>
+      <i class="icon-angle-down"></i>
+      <i class="icon-home"></i>
+    </a>
+    <ul class="list-toolbox">
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/archives/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            博客
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/category/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            分类
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/tag/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            标签
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/about/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            关于
+          </a>
+        </li>
+      
+        <li class="item-toolbox">
+          <a
+            class="CIRCLE"
+            href="/search/"
+            rel="noopener noreferrer"
+            target="_self"
+            >
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+
+
+</div>
+
+
+  <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E5%90%AB%E4%B9%89"><span class="toc-text">线程安全含义</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Java-%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-JMM"><span class="toc-text">Java 内存模型 JMM</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-JMM"><span class="toc-text">什么是 JMM</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E5%90%8C%E6%AD%A5"><span class="toc-text">线程同步</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#synchronized"><span class="toc-text">synchronized</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#volatile"><span class="toc-text">volatile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#java-util-concurrent-atomic"><span class="toc-text">java.util.concurrent.atomic</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Lock"><span class="toc-text">Lock</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+  </div>
+
+
+
+<div class="content content-post CENTER">
+   <article id="post-Java 之线程安全" class="article article-type-post" itemprop="blogPost">
+  <header class="article-header">
+    <h1 class="post-title">Java 之线程安全</h1>
+
+    <div class="article-meta">
+      <span>
+        <i class="icon-calendar"></i>
+        <span>2020.05.07</span>
+      </span>
+
+      
+        <span class="article-author">
+          <i class="icon-user"></i>
+          <span>zhouxelf</span>
+        </span>
+      
+
+      
+  <span class="article-category">
+    <i class="icon-list"></i>
+    <a class="article-category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+  </span>
+
+
+
+      
+
+      
+      <i class="fa fa-eye"></i> 
+        <span id="busuanzi_container_page_pv">
+           &nbsp热度 <span id="busuanzi_value_page_pv">
+           <i class="fa fa-spinner fa-spin"></i></span>℃
+        </span>
+      
+      
+    </div>
+  </header>
+
+  <div class="article-content">
+    
+      <h1 id="线程安全含义"><a href="#线程安全含义" class="headerlink" title="线程安全含义"></a>线程安全含义</h1><p>Java 中多线程编程极大地提高了效率，但是也会带来一些隐患，这就是 Java 中的线程安全问题。</p>
+<p>在单线程中不会出现线程安全问题，而在多线程编程中，有可能出现同时访问同一个资源的情况，这种资源可以是：一个变量、一个对象、一个文件、一个数据表等，而多个线程同时访问同一资源的时候，就会存在一个问题。</p>
+<p>线程是 CPU 调度的最小单元，通俗来讲就是，线程的代码是按照顺序来执行的，执行完毕就是结束的一条线。</p>
+<p>由于每个线程执行的过程是不可控的，所以很可能导致最终的结果和预期相违背或者直接导致程序出错。</p>
+<p>举个栗子:</p>
+<p>现在有两个线程往数据表里插入数据，要求不能插入重复的数据。</p>
+<p>某一时刻，两个线程同时读到了数据 X，之后</p>
+<ol>
+<li>两个线程同时查询数据表有没有数据 X，如果同时查到数据 X 不存在；</li>
+<li>两个线程同时将数据 X 插入数据表。</li>
+</ol>
+<p><code>多个线程同时访问一个资源时，会产生程序运行结果和预期不一致的情况</code>，这就是线程安全问题。</p>
+<p>被多个线程共享的资源，称为: <strong>临界资源</strong>，也叫 <strong>共享资源</strong>。</p>
+<blockquote>
+<p>tips: 当多个线程执行一个方法，方法内部的局部变量不是临界资源，因为方法是在栈上执行的，而 Java 栈是线程私有的，因此不会产生线程安全问题。</p>
+</blockquote>
+<p>基本上所有的并发模型在解决线程安全问题时，都采用 <strong>序列化访问临界资源</strong> 的方案，即在同一时刻，只能有一个线程访问临界资源，也成同步互斥访问。</p>
+<p>通常来说，是在访问临界资源的代码前面加上一个锁，当访问完临界资源后释放锁，让其它线程继续访问。</p>
+<h1 id="Java-内存模型-JMM"><a href="#Java-内存模型-JMM" class="headerlink" title="Java 内存模型 JMM"></a>Java 内存模型 JMM</h1><h3 id="什么是-JMM"><a href="#什么是-JMM" class="headerlink" title="什么是 JMM"></a>什么是 JMM</h3><p>JMM(Java Memory Model)是一种基于 <strong>计算机内存模型(定义了共享内存系统中多线程程序读写操作行为的规范)</strong> 的，屏蔽了各种硬件和操作系统访问差异的，保证了 Java 程序在各种平台下对内存的访问都能保证效果一致的机制和规范。</p>
+<p><img src="/images/JMM_1.png"></p>
+<p>多线程执行中，主内存的变量为共享变量，只有一份，多个线程操作主内存中的共享变量时，都要先从主内存中拷贝一份副本到线程工作内存，执行完毕后，都要将变量副本值同步回主内存中。</p>
+<blockquote>
+<p>tips: 线程工作内存是线程私有内存，线程间无法访问对方的工作内存。</p>
+</blockquote>
+<p>线程对一个变量赋值的流程</p>
+<p><img src="/images/JMM_2.png"></p>
+<p>线程工作内存和主内存之间的数据同步就是通过 JMM，它规定了何时以及如何做线程工作内存和主内存之间的数据同步。</p>
+<p>JMM 保证了共享内存的：</p>
+<ul>
+<li>原子性，对共享内存的操作必须是要么全部执行直到执行结束，且中间过程不能被任何外部因素打断，要么就不执行。</li>
+<li>可见性，多线程操作共享内存时，执行结果能够及时的同步到共享内存，确保其他线程对此结果及时可见。</li>
+<li>有序性，程序的执行顺序按照代码顺序执行，在单线程环境下，程序的执行都是有序的，但是在多线程环境下，JMM 为了性能优化，编译器和处理器会对指令进行重排，程序的执行会变成无序。</li>
+</ul>
+<h1 id="线程同步"><a href="#线程同步" class="headerlink" title="线程同步"></a>线程同步</h1><p>Java 提供了一系列的关键字和类来保证线程安全，主要有以下几种：</p>
+<ul>
+<li>synchronized 关键字</li>
+<li>volatile 关键字</li>
+<li>java.util.concurrent.atomic 包下一系列原子类</li>
+<li>Lock 锁</li>
+</ul>
+<h3 id="synchronized"><a href="#synchronized" class="headerlink" title="synchronized"></a>synchronized</h3><p><strong>1&gt; 保证方法或代码块操作的原子性</strong></p>
+<p>synchronized 保证方法内部或代码块内部资源(数据)的互斥访问。即同一时间，由同一个 <strong>Monitor(监视锁)</strong> 监视的代码，最多只能有一个线程在访问。</p>
+<p>被 synchronized 描述的方法或者代码块在多线程环境下同一时间只能由同一个线程访问，在持有当前 Monitor 的线程执行完成之前，其它线程想要调用就必须排队，直到上一个持有当前 Monitor 的线程执行结束，释放 Monitor，下一个线程才能获得 Monitor 执行。</p>
+<blockquote>
+<p>tips: 如果存在多个 Monitor 的情况下，多个 Monitor 之间是不互斥的。多个 Monitor 的情况出现在自定义多个锁分别来描述不同的方法或代码块，synchronized 在描述代码块时可以指定自定义 Monitor ，默认为 this 即当前类。</p>
+</blockquote>
+<p><strong>2&gt; 保证监视资源的可见性</strong></p>
+<p>保证多线程环境下对监视资源的数据同步。任何线程在获取到 Monitor 的第一时间，会将共享内存中的数据复制到线程工作内存中，任何线程释放 Monitor 的第一时间，会将线程工作内存中的数据复制到共享内存中。</p>
+<p><strong>3&gt; 保证线程间操作的有序性</strong></p>
+<p>synchronized 的原子性保证了由其描述的方法或代码块的操作具有有序性，同一时间最多只能由一个线程访问，<strong>不会触发 JMM 指令重排机制</strong>。</p>
+<p><code>对于 synchronized 方法或代码块，当出现异常时，JMM 会自动释放当前线程占用的锁，因此不会由于异常导致出现死锁现象。</code></p>
+<hr>
+<p><strong>在 Java 中，每一个对象都有一个锁标记(Monitor)。</strong></p>
+<ul>
+<li>当一个线程正在访问一个对象的 synchronized 方法时，<code>其它线程不能访问该对象的其它 synchronized 方法</code>。因为一个对象只有一把锁，当一个线程获取了该对象的锁之后，其它线程就无法获取该对象的锁了，所以无法访问该对象的其它 synchronized 方法。</li>
+<li>当一个线程正在访问一个对象的 synchronized 方法时，<code>其它线程可以访问该对象的非 synchronized 方法</code>。这个原因是，访问非 synchronized 方法不需要获取该对象的锁，如果一个方法没被 synchronized 修饰，说明该方法不会访问临界资源，那其它线程随便访问该方法。</li>
+<li>如果某一时刻，线程 A 需要访问对象 obj_1 的 synchronized 方法 fun_1，线程 B 需要访问对象 obj_2 的 synchronized 方法 fun_1，即使 obj_1、obj_2 都是某个类的对象，也不会产生线程安全问题，因为访问的是不同的对象，不存在互斥问题。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadSYNTest_1</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> x = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> y = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 1. synchronized 方法</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">count</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        x = x + <span class="number">1</span>;</span><br><span class="line">        y = y + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2. synchronized 代码块</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">count</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;  <span class="comment">// 获取当前对象的锁，也可以是类中的一个属性  </span></span><br><span class="line">            x = x + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        y = y + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">runTest</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i&lt; <span class="number">1_00000</span>; i++) &#123;</span><br><span class="line">                    count();</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(<span class="string">&quot;final x from 1: &quot;</span> + x);</span><br><span class="line">                System.out.println(<span class="string">&quot;final y from 1: &quot;</span> + y);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i&lt; <span class="number">1_00000</span>; i++) &#123;</span><br><span class="line">                    count();</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(<span class="string">&quot;final x from 2: &quot;</span> + x);</span><br><span class="line">                System.out.println(<span class="string">&quot;final y from 2: &quot;</span> + y);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> ThreadSYNTest_1().runTest();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>synchronized 代码块比方法更灵活，因为可能一个方法中只有一部分代码需要同步，如果此时对这个方法用 synchronized 修饰，就会影响程序的效率。</p>
+<p><strong>在 Java 中，每一个类也有一个锁标记(Monitor)，用来控制对 static 数据成员的并发访问。</strong></p>
+<ul>
+<li>某一时刻，一个线程执行一个对象的非 static synchronized 方法，另一个线程执行这个对象所属类的 static synchronized 方法，这样不会发生互斥现象，因为访问 static synchronized 方法占用的是类锁，而访问非 static synchronized 方法占用的是对象锁，类锁和对象锁不互斥。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadSYNTest_2</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">print_1</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;x start&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        System.out.println(<span class="string">&quot;x end&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">print_2</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;y start&quot;</span>);</span><br><span class="line">        System.out.println(<span class="string">&quot;y end&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ThreadSYNTest_2 t = <span class="keyword">new</span> ThreadSYNTest_2();</span><br><span class="line">        <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                t.print_1();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start();</span><br><span class="line">        <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                ThreadSYNTest_2.print_2();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h3><p>保证被 volatile 关键字描述的变量的操作具有 <strong>可见性</strong> 和 <strong>有序性</strong> (禁止指令重排)。</p>
+<p>注意：</p>
+<ol>
+<li>volatile 只对基本类型(byte、char、short、int、long、float、double、boolean)的赋值操作和对象的引用赋值操作有效。</li>
+<li>对于 i++ 此类复合操作，volatile 无法保证其有序性和原子性。</li>
+<li>相对 synchronized 来说，volatile 更加轻量一些。</li>
+</ol>
+<h3 id="java-util-concurrent-atomic"><a href="#java-util-concurrent-atomic" class="headerlink" title="java.util.concurrent.atomic"></a>java.util.concurrent.atomic</h3><p>java.util.concurrent.atomic 包提供了一系列的 AtomicBoolean、AtomicInteger、AtomicLong 等类，使用这些类来声明变量可以保证对其操作具有 <strong>原子性</strong> 来保证线程安全。</p>
+<p>实现原理和 synchronized 使用 Monitor(监视锁) 来保证资源在多线程下 <strong>阻塞互斥</strong> 访问不同，java.util.concurrent.atomic 包下的各原子类是基于 <strong>CAS(ComparAndSwap)</strong> 操作原理实现的。</p>
+<p>CAS 又称无锁操作，是一种乐观锁策略，原理就是多线程环境下各线程访问共享变量不会加锁阻塞排队，线程不会被挂起。通俗来讲就是一直循环对比，如果访问冲突就重试，知道没有冲突为止。</p>
+<h3 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h3><p>Lock 也在 java.util.concurrent 包下，是一个接口，其中定义一系列锁的操作方法，Lock 接口主要有 <strong>ReentrantLock、ReentrantReadWriteLock.ReadLock、ReentrantReadWriteLock.WriteLock</strong> 实现类。</p>
+<p>与 synchronized 不同是 Lock 提供了获取锁和释放锁等相关接口，使得使用上更加灵活，同时也可以做更加复杂的操作。</p>
+<p><strong>已经有了 sychronized，为什么还会出现 Lock 呢？</strong></p>
+<p>线程执行 synchronized 修饰的方法或代码块会获取锁，获取锁的线程释放锁会出现两种情况：</p>
+<ol>
+<li>获取锁的线程执行完了代码，线程正常释放锁；</li>
+<li>获取锁的线程执行出现异常，JMM 让线程自动释放锁。</li>
+</ol>
+<p>如果获取锁的线程没有出现异常，但是要等待 IO 或者其它原因(比如调用了 sleep 方法)被阻塞了，但是有没有释放锁，其它线程就只能一直等待，极大的影响效率。因此就需要一种机制避免等待的线程一直等待下去，通过 Lock 就可以实现。</p>
+<p>再举个栗子：当多个线程读写文件时，读写、写写会发生冲突，但是读读是不会发生冲突的，但是采用 synchronized 来实现同步的话，多个线程如果只是同步读的情况，一部分线程也需要等待。因此需要一种机制，保证多个线程同时读的情况不需要等待，通过 Lock 也可以实现。</p>
+<p>此外，Lock 可以检测线程有没有获取到锁，synchronize 是无法做到的。</p>
+<p>总结来说，Lock 相比 synchronized 更加灵活，但是需要注意几点：</p>
+<ol>
+<li><code>sychronized 是 Java 的关键字，是内置特性，Lock 不是 Java 内置的，是一个类，通过这个类实现同步访问。</code></li>
+<li><code>Lock 需要手动释放锁，synchronized 的方法或代码块执行完之后，系统会自动让线程释放锁，而 Lock 必须用户手动释放，如果没有主动释放，就可能出现死锁。</code></li>
+</ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><strong>1&gt; 出现线程安全的问题的原因</strong></p>
+<p>多线程并发环境下，多个线程共同访问同一共享内存资源时，其中一个线程对资源进行写操作的中间(写入已经开始，但还没结束)，其它线程对这个写了一半的资源进行了读操作，或者对这个写了一半的资源进行了写操作，导致此资源出现数据错误。</p>
+<p><strong>2&gt; 如何避免出现线程安全问题？</strong></p>
+<ul>
+<li>保证共享资源在同一时间只能由一个线程进行操作(原子性、有序性)。</li>
+<li>线程操作的结果及时刷新，保证其它线程可以立即获取到修改后的最新数据(可见性)。</li>
+</ul>
+<p><br><br></p>
+
+    
+  </div>
+
+</article>
+
+
+   
+
+   
+  <div class="box-prev-next clearfix">
+    <a class="show pull-left" href="/2020/04/26/Java%20%E4%B9%8B%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+        <i class="icon icon-angle-left"></i>
+    </a>
+    <a class="show pull-right" href="/2020/08/03/Java%20%E9%94%81%E6%9C%BA%E5%88%B6/">
+        <i class="icon icon-angle-right"></i>
+    </a>
+  </div>
+
+
+
+
+</div>
+
+
+  <a id="backTop" class="back-top">
+    <i class="icon-angle-up"></i>
+  </a>
+
+
+
+
+  <div class="modal" id="modal">
+  <span id="cover" class="cover hide"></span>
+  <div id="modal-dialog" class="modal-dialog hide-dialog">
+    <div class="modal-header">
+      <span id="close" class="btn-close">关闭</span>
+    </div>
+    <hr>
+    <div class="modal-body">
+      <ul class="list-toolbox">
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/archives/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              博客
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/category/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              分类
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/tag/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              标签
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/about/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              关于
+            </a>
+          </li>
+        
+          <li class="item-toolbox">
+            <a
+              class="CIRCLE"
+              href="/search/"
+              rel="noopener noreferrer"
+              target="_self"
+              >
+              搜索
+            </a>
+          </li>
+        
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+  
+      <div class="fexo-comments comments-post">
+    
+
+    
+
+    
+  <section id="changyan-comments">
+    <div id="SOHUCS" sid="Java 之线程安全"></div>
+    <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js" ></script>
+    <script type="text/javascript">
+      window.changyan.api.config({
+        appid: 'cyt7l11BM',
+        conf: 'prod_a98ea73c3a76aca2a1fbc73edb66a25d'
+      });
+    </script>
+  </section>
+
+    
+
+    
+
+    
+    
+
+    
+
+  </div>
+
+  
+
+  <script type="text/javascript">
+  function loadScript(url, callback) {
+    var script = document.createElement('script')
+    script.type = 'text/javascript';
+
+    if (script.readyState) { //IE
+      script.onreadystatechange = function() {
+        if (script.readyState == 'loaded' ||
+          script.readyState == 'complete') {
+          script.onreadystatechange = null;
+          callback();
+        }
+      };
+    } else { //Others
+      script.onload = function() {
+        callback();
+      };
+    }
+
+    script.src = url;
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }
+
+  window.onload = function() {
+    loadScript('/js/bundle.js?235683', function() {
+      // load success
+    });
+  }
+</script>
+
+</body>
+</html>
